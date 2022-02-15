@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
@@ -8,39 +9,56 @@ public class Player : AnimatedPlayerCharacter
     [SerializeField]
     private float moveSpeed;
 
-    [SerializeField]
-    private float angularSpeed;
-
     private CharacterController characterController;
+    private bool isMoving;
 
     protected override void Awake()
     {
         base.Awake();
         characterController = GetComponent<CharacterController>();
 
-        GeneralEventsContainer.JoystickCommanded += OnJoystickCommanded;
+        EventsContainer.PlayerShouldStartMoving += StartMoving;
     }
 
-    public void OnJoystickCommanded(JoystickCommand joy)
+    private void OnDestroy()
+    { 
+        EventsContainer.PlayerShouldStartMoving -= StartMoving;
+    }
+
+    private void StartMoving()
     {
-        if (!joy.IsValid)
+        if (animationState != AnimationState.Running)
+        {
+            SetAnimationState(AnimationState.Running);
+            StartCoroutine(Moving());
+        }
+        else
+        { 
+            Debug.LogError("Invalid animation state");
+        }
+    }
+
+    private IEnumerator Moving()
+    {
+        isMoving = true;
+        while (isMoving)
+        {
+            characterController.Move(moveSpeed * Time.deltaTime * transform.forward);
+            yield return null;
+        }
+    }
+
+    private void StopMoving()
+    { 
+        if (animationState != AnimationState.Idle)
         {
             SetAnimationState(AnimationState.Idle);
-            return;
+            isMoving = false;
         }
-        float cameraEulerY = QueriesContainer.QueryCurrentCameraYaw();
-
-        SetAnimationState(AnimationState.Running);
-
-        Vector3 moveDirection = new Vector3(joy.Horiz, 0, joy.Vert);
-        //moveDirection = Quaternion.Euler(0, cameraEulerY, 0) * moveDirection;
-        
-        characterController.Move(moveSpeed * Time.deltaTime * moveDirection);
-
-        float rotateStep = angularSpeed * Time.deltaTime;
-        Quaternion targetRotation = Quaternion.LookRotation(moveDirection, Vector3.up);
-        transform.rotation =
-              Quaternion.RotateTowards(transform.rotation, targetRotation, rotateStep);
+        else
+        {
+            Debug.LogError("Invalid animation state");
+        }
     }
 }
 

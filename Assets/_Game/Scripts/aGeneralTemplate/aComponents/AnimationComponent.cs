@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace GeneralTemplate
 {
+    /// <summary>
+    /// rarely used, acts more like a template
+    /// </summary> 
     public class AnimationComponent : MonoBehaviour
     {
         private enum AnimationType

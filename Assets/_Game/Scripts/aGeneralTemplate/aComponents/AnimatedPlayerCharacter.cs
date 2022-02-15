@@ -13,7 +13,6 @@ public class AnimatedPlayerCharacter : MonoBehaviour
     protected enum AnimationState
     {
         Idle,
-        Walking,
         Running
     }
 
@@ -36,11 +35,8 @@ public class AnimatedPlayerCharacter : MonoBehaviour
             case AnimationState.Idle:
                 animator.SetInteger("AnimationState", 0);
                 break;
-            case AnimationState.Walking:
-                animator.SetInteger("AnimationState", 1);
-                break;
             case AnimationState.Running:
-                animator.SetInteger("AnimationState", 2);
+                animator.SetInteger("AnimationState", 1);
                 break;
         }
         animationState = newState;
