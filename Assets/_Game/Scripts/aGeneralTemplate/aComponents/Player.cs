@@ -18,6 +18,7 @@ public class Player : AnimatedPlayerCharacter
         characterController = GetComponent<CharacterController>();
 
         EventsContainer.PlayerShouldStartMoving += StartMoving;
+        EventsContainer.PlayerShouldStartMoving?.Invoke();
     }
 
     private void OnDestroy()
@@ -41,9 +42,20 @@ public class Player : AnimatedPlayerCharacter
     private IEnumerator Moving()
     {
         isMoving = true;
+        float currentMoveSpeed = 0;
+        bool shouldAccelerate = true;
         while (isMoving)
         {
-            characterController.Move(moveSpeed * Time.deltaTime * transform.forward);
+            if (shouldAccelerate)
+            { 
+                currentMoveSpeed += moveSpeed * Time.deltaTime;
+                if (currentMoveSpeed >= moveSpeed)
+                {
+                    shouldAccelerate = false;
+                    currentMoveSpeed = moveSpeed;
+                }
+            }
+            characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
             yield return null;
         }
     }
