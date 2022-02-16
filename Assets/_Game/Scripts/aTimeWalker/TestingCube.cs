@@ -14,15 +14,8 @@ public class TestingCube : Timeable
     protected override void Awake()
     {
         base.Awake();
-        timeStateParameter = 0;
-
         startingPosition = startingTransform.position;
         endingPosition = endingTransform.position;
-    }
-
-    protected override void OnDestroy()
-    {
-        base.OnDestroy();
     }
 
     protected override void OnTimeStateChange(float timeState)

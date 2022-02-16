@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 
-public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragHandler
+public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragHandler, IPointerUpHandler
 {
     [SerializeField]
     private RectTransform arrowRectTransform;
@@ -62,6 +62,11 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
 
         EventsContainer.ClockArrowMoved?.Invoke(angle);
         arrowRectTransform.eulerAngles = new Vector3(0, 0, -angle * Mathf.Rad2Deg);
+    }
+
+    public void OnPointerUp(PointerEventData data)
+    {
+        shouldTimePass = true;
     }
 
 }

@@ -2,8 +2,6 @@ using UnityEngine;
 
 public class Timeable : MonoBehaviour
 {
-    protected float timeStateParameter;
-
     protected virtual void Awake()
     {
         EventsContainer.TimeStateChange += OnTimeStateChange;
@@ -18,5 +16,4 @@ public class Timeable : MonoBehaviour
     { 
 
     }
-
 }
