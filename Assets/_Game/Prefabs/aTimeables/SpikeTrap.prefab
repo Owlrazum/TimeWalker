@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6058793433993502307}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpikesRow (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -147,7 +147,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6058793434018975882}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpikesRow
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -855,7 +855,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6058793434228090961}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpikesRow (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3368,7 +3368,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6058793434891617264}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpikesRow (4)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3412,7 +3412,7 @@ GameObject:
   m_Component:
   - component: {fileID: 6058793434919982662}
   - component: {fileID: 6058793434919982661}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpikeTrap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -3462,7 +3462,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6058793434932539138}
-  m_Layer: 0
+  m_Layer: 6
   m_Name: SpikesRow (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}

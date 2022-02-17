@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 
 public class SpikeTrap : Timeable
@@ -36,7 +37,10 @@ public class SpikeTrap : Timeable
 
     protected override void OnTimeStateChange(float timeState)
     {
-        base.OnTimeStateChange(timeState);
+        if (!shouldRespondToTimeChange)
+        {
+            return;
+        }
 
         timeState *= 2 * Mathf.PI;
         float delta = Mathf.PI / 12;
@@ -48,7 +52,62 @@ public class SpikeTrap : Timeable
         }
     }
 
-    // protected override void OnTimeStateChange(float timeState)
+    protected override void OnAllTimeablesShouldDefault(float timeDefault)
+    {
+        base.OnAllTimeablesShouldDefault(timeDefault);
+
+        foreach (Transform spikeRow in spikeRows)
+        { 
+            Vector3 prevPos = spikeRow.transform.position;
+            if (prevPos.y == startHeight)
+            {
+                continue;
+            }
+
+            StartCoroutine(ReturnToDefaultSpikeRow(timeDefault, spikeRow));
+        }
+    }
+
+    private IEnumerator ReturnToDefaultSpikeRow(float timeDefault, Transform spikeRow)
+    { 
+        shouldRespondToTimeChange = false;
+        float lerpParam = 0;
+        Vector3 prevPos = spikeRow.position;
+        Vector3 startPos = spikeRow.position;
+        startPos.y = startHeight;
+        while (lerpParam < 1)
+        {
+            lerpParam += Time.deltaTime / timeDefault;
+            spikeRow.position = Vector3.Lerp(
+                prevPos,
+                startPos,
+                CustomMath.EaseOut(lerpParam)
+            );
+            yield return null;
+        }
+        shouldRespondToTimeChange = true;
+    }
+
+    private void ChangeSpikeRowHeight(Transform spikeRow, float lerpParam)
+    {
+        float newHeight;
+        if (lerpParam <= 0.5f)
+        {
+            lerpParam *= 2;
+            newHeight = Mathf.Lerp(startHeight, maxHeight, lerpParam);
+        }
+        else
+        {
+            lerpParam = (lerpParam - 0.5f) * 2;
+            newHeight = Mathf.Lerp(maxHeight, startHeight, lerpParam);
+        }
+        Vector3 pos = spikeRow.transform.position;
+        pos.y = newHeight;
+        spikeRow.transform.position = pos;
+    }
+}
+
+ // protected override void OnTimeStateChange(float timeState)
     // {
     //     base.OnTimeStateChange(timeState);
 
@@ -76,22 +135,3 @@ public class SpikeTrap : Timeable
     //         }
     //     }
     // }
-
-    private void ChangeSpikeRowHeight(Transform spikeRow, float lerpParam)
-    {
-        float newHeight;
-        if (lerpParam <= 0.5f)
-        {
-            lerpParam *= 2;
-            newHeight = Mathf.Lerp(startHeight, maxHeight, lerpParam);
-        }
-        else
-        {
-            lerpParam = (lerpParam - 0.5f) * 2;
-            newHeight = Mathf.Lerp(maxHeight, startHeight, lerpParam);
-        }
-        Vector3 pos = spikeRow.transform.position;
-        pos.y = newHeight;
-        spikeRow.transform.position = pos;
-    }
-}

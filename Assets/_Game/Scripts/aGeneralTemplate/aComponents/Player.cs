@@ -13,7 +13,7 @@ public class Player : AnimatedPlayerCharacter
     private SingleUnityLayer deathLayer;
 
     private CharacterController characterController;
-    private bool isMoving;
+    private Vector3 posOfMaxSpeed;
 
     protected override void Awake()
     {
@@ -22,6 +22,7 @@ public class Player : AnimatedPlayerCharacter
 
         EventsContainer.PlayerShouldStartMoving += StartMoving;
         EventsContainer.PlayerShouldStartMoving?.Invoke();
+
     }
 
     private void OnDestroy()
@@ -42,6 +43,7 @@ public class Player : AnimatedPlayerCharacter
         }
     }
 
+    private bool isMoving;
     private IEnumerator Moving()
     {
         isMoving = true;
@@ -56,6 +58,7 @@ public class Player : AnimatedPlayerCharacter
                 {
                     shouldAccelerate = false;
                     currentMoveSpeed = moveSpeed;
+                    posOfMaxSpeed = transform.position;
                 }
             }
             characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
@@ -80,7 +83,42 @@ public class Player : AnimatedPlayerCharacter
     {
         if (other.gameObject.layer == deathLayer.LayerIndex)
         {
-            GeneralEventsContainer.LevelFailed?.Invoke();
+            EventsContainer.PlayerCollidedWithDeath?.Invoke();
+            StartReverseMoving();
+        }
+    }
+
+    private void StartReverseMoving()
+    {
+        isMoving = false;
+        SetAnimationState(AnimationState.ReverseRunning);
+        StartCoroutine(ReverseMoving());
+    }
+
+    private bool isReverseMoving;
+    private IEnumerator ReverseMoving()
+    {
+        isReverseMoving = true;
+        float currentMoveSpeed = moveSpeed;
+        bool isDeleratingEventRaised = false;
+        while (isReverseMoving)
+        { 
+            if (transform.position.z <= posOfMaxSpeed.z)
+            {
+                if (!isDeleratingEventRaised)
+                {
+                    EventsContainer.PlayerStartedDecelerating?.Invoke();
+                    isDeleratingEventRaised = true;
+                }
+                currentMoveSpeed -= moveSpeed * Time.deltaTime;
+                if (currentMoveSpeed <= 0)
+                {
+                    currentMoveSpeed = 0;
+                    SetAnimationState(AnimationState.Idle);
+                }
+            }
+            characterController.Move(currentMoveSpeed * Time.deltaTime * -transform.forward);
+            yield return null;
         }
     }
 }

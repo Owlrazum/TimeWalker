@@ -2,18 +2,7 @@ using UnityEngine;
 
 namespace GeneralTemplate
 {
-    // TODO Decide whether ParticlesController should use ObjectPool;
-    // TODO Custom Mechanics, remove from project and make packages. Or do not.
-
-    // TODO Update scenes L1 L2, add prefabs (eg LevelDataHandover)
-
-    // TODO Make a virtual class for fading animations.
-
-    // Tip: There is a confetti plane in the main camera.
-
-    // TODO make a patterns text somewhere, DoRotateSequence after each stage.
-
-    // TODO Implement an EventContainer instead of layered architecture, because events are more fitted to our case.
+    // Fail is a rewind, all traps are paused.
 
     /// <summary>
     /// General functionality in our projects. 
