@@ -9,6 +9,9 @@ public class Player : AnimatedPlayerCharacter
     [SerializeField]
     private float moveSpeed;
 
+    [SerializeField]
+    private SingleUnityLayer deathLayer;
+
     private CharacterController characterController;
     private bool isMoving;
 
@@ -70,6 +73,14 @@ public class Player : AnimatedPlayerCharacter
         else
         {
             Debug.LogError("Invalid animation state");
+        }
+    }
+
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject.layer == deathLayer.LayerIndex)
+        {
+            GeneralEventsContainer.LevelFailed?.Invoke();
         }
     }
 }
