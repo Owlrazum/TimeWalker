@@ -10,8 +10,22 @@ public class SpikeTrap : Timeable
     private float offset;
 
     [SerializeField]
+    [Tooltip("Used for the sin wave")]
+    private float divisorForPI = 12;
+
+    [SerializeField]
+    [Tooltip("Should be the same and manually set")]
+    private float distanceBetweenRows;
+
+    [SerializeField]
+    [Tooltip("Those less and greater will be affected")]
+    private float affectRange;
+
+    [SerializeField]
     [Tooltip("Uses its own hierarchy for the logic. Each child is assumed as the row of the spikes.")]
     private string readTooltip;
+
+    private float totalRowWiseDistance;
 
     private float startHeight;
 
@@ -33,6 +47,7 @@ public class SpikeTrap : Timeable
         }
 
         startHeight = spikeRows[0].transform.position.y;
+        totalRowWiseDistance = spikeRows.Length * distanceBetweenRows;
     }
 
     protected override void OnTimeStateChange(float timeState)
@@ -42,51 +57,70 @@ public class SpikeTrap : Timeable
             return;
         }
 
-        timeState *= 2 * Mathf.PI;
-        float delta = Mathf.PI / 12;
+        timeState *= 2;
+        timeState -= 0.5f;
 
         for (int i = 0; i < spikeRows.Length; i++)
         {
-            float lerpParam = Mathf.Sin(timeState) + Mathf.Sin(delta) * i;
-            ChangeSpikeRowHeight(spikeRows[i], lerpParam);
-        }
-    }
+            float distanceFromOrigin = i * distanceBetweenRows;
+            float distParam = distanceFromOrigin / totalRowWiseDistance;
+            //distParam = CustomMath.Flip(distParam);
 
-    protected override void OnAllTimeablesShouldDefault(float timeDefault)
-    {
-        base.OnAllTimeablesShouldDefault(timeDefault);
-
-        foreach (Transform spikeRow in spikeRows)
-        { 
-            Vector3 prevPos = spikeRow.transform.position;
-            if (prevPos.y == startHeight)
+            Debug.Log(
+                "DistParam " + distParam + "\n" +
+                "TimeState " + timeState + "\n"
+            );
+            //Debug.Break();
+            float distTimeRelation = Mathf.Abs(distParam - timeState);
+            if (distTimeRelation > affectRange)
             {
                 continue;
             }
 
-            StartCoroutine(ReturnToDefaultSpikeRow(timeDefault, spikeRow));
+            distParam -= timeState - affectRange;
+            float angleParam = distParam / (affectRange * 2);
+            angleParam *= Mathf.PI / 2;
+
+            float lerpParam = Mathf.Sin(angleParam);
+            ChangeSpikeRowHeight(spikeRows[i], lerpParam);
         }
     }
 
-    private IEnumerator ReturnToDefaultSpikeRow(float timeDefault, Transform spikeRow)
-    { 
-        shouldRespondToTimeChange = false;
-        float lerpParam = 0;
-        Vector3 prevPos = spikeRow.position;
-        Vector3 startPos = spikeRow.position;
-        startPos.y = startHeight;
-        while (lerpParam < 1)
-        {
-            lerpParam += Time.deltaTime / timeDefault;
-            spikeRow.position = Vector3.Lerp(
-                prevPos,
-                startPos,
-                CustomMath.EaseOut(lerpParam)
-            );
-            yield return null;
-        }
-        shouldRespondToTimeChange = true;
-    }
+    // protected override void OnAllTimeablesShouldDefault(float timeDefault)
+    // {
+    //     base.OnAllTimeablesShouldDefault(timeDefault);
+
+    //     foreach (Transform spikeRow in spikeRows)
+    //     { 
+    //         Vector3 prevPos = spikeRow.transform.position;
+    //         if (prevPos.y == startHeight)
+    //         {
+    //             continue;
+    //         }
+
+    //         StartCoroutine(ReturnToDefaultSpikeRow(timeDefault, spikeRow));
+    //     }
+    // }
+
+    // private IEnumerator ReturnToDefaultSpikeRow(float timeDefault, Transform spikeRow)
+    // { 
+    //     shouldRespondToTimeChange = false;
+    //     float lerpParam = 0;
+    //     Vector3 prevPos = spikeRow.position;
+    //     Vector3 startPos = spikeRow.position;
+    //     startPos.y = startHeight;
+    //     while (lerpParam < 1)
+    //     {
+    //         lerpParam += Time.deltaTime / timeDefault;
+    //         spikeRow.position = Vector3.Lerp(
+    //             prevPos,
+    //             startPos,
+    //             CustomMath.EaseOut(lerpParam)
+    //         );
+    //         yield return null;
+    //     }
+    //     shouldRespondToTimeChange = true;
+    // }
 
     private void ChangeSpikeRowHeight(Transform spikeRow, float lerpParam)
     {

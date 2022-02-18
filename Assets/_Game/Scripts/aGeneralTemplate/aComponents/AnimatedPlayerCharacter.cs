@@ -23,9 +23,10 @@ public class AnimatedPlayerCharacter : MonoBehaviour
     {
         animationState = AnimationState.Idle;
         animator = transform.GetChild(0).GetComponent<Animator>();
+        animator.applyRootMotion = false;
     }
 
-    protected virtual void SetAnimationState(AnimationState newState)
+    protected void SetAnimationState(AnimationState newState)
     {
         if (animationState == newState)
         {
@@ -40,9 +41,16 @@ public class AnimatedPlayerCharacter : MonoBehaviour
                 animator.SetInteger("AnimationState", 1);
                 break;
             case AnimationState.ReverseRunning:
+                print("ReverseRunning Animatoin state set");
                 animator.SetInteger("AnimationState", 2);
+                animator.applyRootMotion = false;
                 break;
         }
         animationState = newState;
+    }
+
+    protected void SetReverseRunningAnimationSpeed(float speed)
+    {
+        animator.SetFloat("ReverseRunningSpeed", speed);
     }
 }

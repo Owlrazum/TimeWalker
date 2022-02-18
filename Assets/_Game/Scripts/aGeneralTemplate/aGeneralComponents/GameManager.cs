@@ -2,7 +2,13 @@ using UnityEngine;
 
 namespace GeneralTemplate
 {
-    // Fail is a rewind, all traps are paused.
+    // Fail should to loop.
+    // Две частоты у всех ловушек.
+    // Customized UI with the clock instead of button.
+
+    // one big wave; // WOOOOOOOOH;
+
+    // Build.
 
     /// <summary>
     /// General functionality in our projects. 

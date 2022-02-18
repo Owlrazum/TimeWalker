@@ -29,4 +29,17 @@ public static class QueriesContainer
 
         return CurrentPlayerTransform.Invoke();
     }
+
+    public static Func<float> PlayerMoveSpeed;
+    public static float QueryPlayerMoveSpeed()
+    {
+#if UNITY_EDITOR
+        if (PlayerMoveSpeed.GetInvocationList().Length != 1)
+        {
+            throw new NotSupportedException("There should be only one subscription");
+        }
+#endif        
+
+        return PlayerMoveSpeed.Invoke();
+    }
 }

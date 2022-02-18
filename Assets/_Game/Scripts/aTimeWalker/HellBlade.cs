@@ -29,28 +29,28 @@ public class HellBlade : Timeable
         prevTimeState = timeState;
     }
 
-    protected override void OnAllTimeablesShouldDefault(float timeDefault)
-    {
-        base.OnAllTimeablesShouldDefault(timeDefault);
-        print("HellBlade default");
-        StartCoroutine(ReturnToDefault(timeDefault));
-    }
+    // protected override void OnAllTimeablesShouldDefault(float timeDefault)
+    // {
+    //     base.OnAllTimeablesShouldDefault(timeDefault);
+    //     print("HellBlade default");
+    //     StartCoroutine(ReturnToDefault(timeDefault));
+    // }
 
-    private IEnumerator ReturnToDefault(float timeDefault)
-    { 
-        shouldRespondToTimeChange = false;
-        float lerpParam = 0;
-        Vector3 prevEuler = transform.eulerAngles;
-        while (lerpParam < 1)
-        {
-            lerpParam += Time.deltaTime / timeDefault;
-            transform.eulerAngles = Vector3.Lerp(
-                prevEuler,
-                initialEuler,
-                CustomMath.EaseOut(lerpParam)
-            );
-            yield return null;
-        }
-        shouldRespondToTimeChange = true;
-    }
+    // private IEnumerator ReturnToDefault(float timeDefault)
+    // { 
+    //     shouldRespondToTimeChange = false;
+    //     float lerpParam = 0;
+    //     Vector3 prevEuler = transform.eulerAngles;
+    //     while (lerpParam < 1)
+    //     {
+    //         lerpParam += Time.deltaTime / timeDefault;
+    //         transform.eulerAngles = Vector3.Lerp(
+    //             prevEuler,
+    //             initialEuler,
+    //             CustomMath.EaseOut(lerpParam)
+    //         );
+    //         yield return null;
+    //     }
+    //     shouldRespondToTimeChange = true;
+    // }
 }

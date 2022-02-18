@@ -17,13 +17,13 @@ public class TimeController : MonoBehaviour
     private void Awake()
     {
         EventsContainer.ClockArrowMoved += OnClockArrowMoved;
-        EventsContainer.PlayerCollidedWithDeath += OnPlayerCollidedWithDeath;
+        //EventsContainer.PlayerCollidedWithDeath += OnPlayerCollidedWithDeath;
     }
 
     private void OnDestroy()
     {
         EventsContainer.ClockArrowMoved -= OnClockArrowMoved;
-        EventsContainer.PlayerCollidedWithDeath -= OnPlayerCollidedWithDeath;
+        //EventsContainer.PlayerCollidedWithDeath -= OnPlayerCollidedWithDeath;
     }
 
     private void OnClockArrowMoved(float angle)
@@ -32,9 +32,9 @@ public class TimeController : MonoBehaviour
         EventsContainer.TimeStateChange?.Invoke(timeState);
     }
 
-    private void OnPlayerCollidedWithDeath()
-    {
-        print("AllTimeablesShouldDefault");
-        EventsContainer.AllTimeablesShouldDefault?.Invoke(timeDefault);
-    }
+    // private void OnPlayerCollidedWithDeath()
+    // {
+    //     print("AllTimeablesShouldDefault");
+    //     EventsContainer.AllTimeablesShouldDefault?.Invoke(timeDefault);
+    // }
 }

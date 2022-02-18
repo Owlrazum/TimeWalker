@@ -9,13 +9,13 @@ public class Timeable : MonoBehaviour
         shouldRespondToTimeChange = true;
 
         EventsContainer.TimeStateChange += OnTimeStateChange;
-        EventsContainer.AllTimeablesShouldDefault += OnAllTimeablesShouldDefault;
+        //EventsContainer.AllTimeablesShouldDefault += OnAllTimeablesShouldDefault;
     }
 
     protected virtual void OnDestroy()
     {
         EventsContainer.TimeStateChange -= OnTimeStateChange;
-        EventsContainer.AllTimeablesShouldDefault -= OnAllTimeablesShouldDefault;
+        //EventsContainer.AllTimeablesShouldDefault -= OnAllTimeablesShouldDefault;
     }
 
     protected virtual void OnTimeStateChange(float newTimeStateChange)
@@ -23,8 +23,8 @@ public class Timeable : MonoBehaviour
 
     }
 
-    protected virtual void OnAllTimeablesShouldDefault(float timeDefault)
-    {
-        shouldRespondToTimeChange = false;
-    }
+    // protected virtual void OnAllTimeablesShouldDefault(float timeDefault)
+    // {
+    //     shouldRespondToTimeChange = false;
+    // }
 }

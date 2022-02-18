@@ -11,8 +11,7 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
     private RectTransform arrowRectTransform;
 
     [SerializeField]
-    [Tooltip("In degrees")]
-    private float speedOfTimeDeg;
+    private float speedOfUsualTimeDeg;
 
     [SerializeField]
     private float speedOfApproachRad;
@@ -24,11 +23,13 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
     private float approachEpsilon;
 
     private RectTransform rect;
+
     private bool isPositive;
     private bool shouldTimePass;
     private bool shouldRespondToInput;
 
     private float currentAngle;
+    private float totalAddedAngle;
 
     private float angleToApproach;
     private bool haveApproached;
@@ -42,38 +43,41 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         shouldRespondToInput = true;
 
         currentAngle = 0;
+        totalAddedAngle = 0;
 
         EventsContainer.PlayerCollidedWithDeath += OnPlayerCollidedWithDeath;
-        EventsContainer.PlayerStartedDecelerating += OnPlayerStartedDecelerating;
-        EventsContainer.PlayerRevertedToStartPos += OnPlayerRevertedToStartPos;
+        //EventsContainer.PlayerRevertedToStartPos += OnPlayerRevertedToStartPos;
     }
 
     private void OnDestroy()
     { 
         EventsContainer.PlayerCollidedWithDeath -= OnPlayerCollidedWithDeath;
-        EventsContainer.PlayerStartedDecelerating -= OnPlayerStartedDecelerating;
-        EventsContainer.PlayerRevertedToStartPos -= OnPlayerRevertedToStartPos;
+        //EventsContainer.PlayerRevertedToStartPos -= OnPlayerRevertedToStartPos;
     }
 
     private void OnPlayerCollidedWithDeath()
     {
         shouldTimePass = false;
         shouldRespondToInput = false;
-        StartCoroutine(RevertingAnimation());
+        EventsContainer.PlayerShouldStartReverting(speedOfRevertingDeg / speedOfUsualTimeDeg);
+        StartCoroutine(RevertingTime());
     }
 
-    private void OnPlayerRevertedToStartPos()
-    {
-        shouldTimePass = true;
-        shouldRespondToInput = true;
-    }
+    // private void OnPlayerRevertedToStartPos()
+    // {
+    //     shouldTimePass = true;
+    //     shouldRespondToInput = true;
+    // }
 
     private void Update()
     {
         if (shouldTimePass)
         { 
-            float step = speedOfTimeDeg * Time.deltaTime;
-            arrowRectTransform.eulerAngles += new Vector3(0, 0, -step);
+            float step = speedOfUsualTimeDeg * Time.deltaTime;
+            Vector3 toAdd = new Vector3(0, 0, -step);
+            arrowRectTransform.eulerAngles += toAdd;
+            totalAddedAngle += step;
+
             currentAngle = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
 
             EventsContainer.ClockArrowMoved?.Invoke(arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad);
@@ -101,6 +105,7 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         }
 
         float angle = ComputePressAngle(data.position);
+        totalAddedAngle += angle - currentAngle;
 
         if (!haveApproached)
         {
@@ -186,28 +191,40 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         shouldTimePass = true;
     }
 
-    private IEnumerator RevertingAnimation()
+    private IEnumerator RevertingTime()
     {
-        print("EnteredArrowRevertingAnimation");
-        while (!isPlayerStartedDecelerating)
+        int revolutionsCount = (int)totalAddedAngle / 360;
+        float remainedAngle = 0;
+
+        for (int i = 0; i < revolutionsCount; i++)
         {
-            float step = speedOfRevertingDeg * Time.deltaTime;
-            arrowRectTransform.eulerAngles += new Vector3(0, 0, step); // in opposite direction of the one in the update
-            currentAngle = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
-            yield return null;
-        }
-        print("ProcessStartDeceleration");
-        while (transform.rotation != Quaternion.identity)
-        {
-            float step = speedOfRevertingDeg * Time.deltaTime;
-            transform.rotation = Quaternion.RotateTowards(
-                transform.rotation, Quaternion.identity, step
-            );
-            currentAngle = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
-            yield return null;
+            remainedAngle = 360;
+            while (remainedAngle > 0)
+            { 
+                float step = speedOfRevertingDeg * Time.deltaTime;
+                arrowRectTransform.eulerAngles -= new Vector3(0, 0, -step);
+
+                currentAngle = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
+                EventsContainer.ClockArrowMoved?.Invoke(currentAngle);
+
+                remainedAngle -= step;
+                yield return null;
+            }
         }
 
-        transform.rotation = Quaternion.identity;
+        remainedAngle = totalAddedAngle % 360;
+        while (remainedAngle > 0)
+        {
+            float step = speedOfRevertingDeg * Time.deltaTime;
+            arrowRectTransform.eulerAngles -= new Vector3(0, 0, -step);
+
+            currentAngle = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
+            EventsContainer.ClockArrowMoved?.Invoke(currentAngle);
+
+            remainedAngle -= step;
+            yield return null;
+        }
+        arrowRectTransform.eulerAngles = Vector3.zero;
     }
 
     private bool isPlayerStartedDecelerating;

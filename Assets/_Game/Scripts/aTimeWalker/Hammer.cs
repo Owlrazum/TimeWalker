@@ -46,27 +46,27 @@ public class Hammer : Timeable
         }
     }
 
-    protected override void OnAllTimeablesShouldDefault(float timeDefault)
-    {
-        base.OnAllTimeablesShouldDefault(timeDefault);
-        StartCoroutine(ReturnToDefault(timeDefault));
-    }
+    // protected override void OnAllTimeablesShouldDefault(float timeDefault)
+    // {
+    //     base.OnAllTimeablesShouldDefault(timeDefault);
+    //     StartCoroutine(ReturnToDefault(timeDefault));
+    // }
 
-    private IEnumerator ReturnToDefault(float timeDefault)
-    {
-        shouldRespondToTimeChange = false;
-        float lerpParam = 0;
-        Vector3 prevEuler = transform.eulerAngles;
-        while (lerpParam < 1)
-        {
-            lerpParam += Time.deltaTime / timeDefault;
-            transform.eulerAngles = Vector3.Lerp(
-                prevEuler,
-                startingEuler,
-                CustomMath.EaseOut(lerpParam)
-            );
-            yield return null;
-        }
-        shouldRespondToTimeChange = true;
-    }
+    // private IEnumerator ReturnToDefault(float timeDefault)
+    // {
+    //     shouldRespondToTimeChange = false;
+    //     float lerpParam = 0;
+    //     Vector3 prevEuler = transform.eulerAngles;
+    //     while (lerpParam < 1)
+    //     {
+    //         lerpParam += Time.deltaTime / timeDefault;
+    //         transform.eulerAngles = Vector3.Lerp(
+    //             prevEuler,
+    //             startingEuler,
+    //             CustomMath.EaseOut(lerpParam)
+    //         );
+    //         yield return null;
+    //     }
+    //     shouldRespondToTimeChange = true;
+    // }
 }
