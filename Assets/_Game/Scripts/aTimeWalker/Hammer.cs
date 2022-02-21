@@ -17,56 +17,44 @@ public class Hammer : Timeable
         base.Awake();
         startingEuler = new Vector3(0, 0, startingRotation);
         endingEuler = new Vector3(0, 0, endingRotation);
+        
+        //Offset if AfterPI;
+        OnTimeStateChange(0);
     }
 
-    protected override void OnTimeStateChange(float timeState)
+    protected override float OnTimeStateChange(float timeState)
     {
         if (!shouldRespondToTimeChange)
         {
-            return;
+            return -1;
+        }
+
+        float prevTimeState = timeState;
+        timeState = base.OnTimeStateChange(timeState);
+        if (Mathf.Abs(timeState - prevTimeState) == 0.5f)
+        { 
+            print("It is modified");
         }
 
         if (timeState < 0.5f)
         {
             timeState *= 2;
-            transform.eulerAngles = Vector3.Lerp(
-                startingEuler,
-                endingEuler,
+            transform.rotation = Quaternion.Slerp(
+                Quaternion.Euler(startingEuler),
+                Quaternion.Euler(endingEuler),
                 timeState
             );
         }
         else
         { 
             timeState = (timeState - 0.5f) * 2;
-            transform.eulerAngles = Vector3.Lerp(
-                endingEuler, 
-                startingEuler, 
+            transform.rotation = Quaternion.Slerp(
+                Quaternion.Euler(endingEuler),
+                Quaternion.Euler(startingEuler),
                 CustomMath.EaseOut(timeState)
             );
         }
+
+        return 0;
     }
-
-    // protected override void OnAllTimeablesShouldDefault(float timeDefault)
-    // {
-    //     base.OnAllTimeablesShouldDefault(timeDefault);
-    //     StartCoroutine(ReturnToDefault(timeDefault));
-    // }
-
-    // private IEnumerator ReturnToDefault(float timeDefault)
-    // {
-    //     shouldRespondToTimeChange = false;
-    //     float lerpParam = 0;
-    //     Vector3 prevEuler = transform.eulerAngles;
-    //     while (lerpParam < 1)
-    //     {
-    //         lerpParam += Time.deltaTime / timeDefault;
-    //         transform.eulerAngles = Vector3.Lerp(
-    //             prevEuler,
-    //             startingEuler,
-    //             CustomMath.EaseOut(lerpParam)
-    //         );
-    //         yield return null;
-    //     }
-    //     shouldRespondToTimeChange = true;
-    // }
 }

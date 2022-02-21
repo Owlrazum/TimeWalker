@@ -14,5 +14,6 @@ public static class EventsContainer
     //public static Action<float> AllTimeablesShouldDefault;
 
     public static Action<float> ClockArrowMoved;
-    public static Action<float> TimeStateChange;
+    // It is a func as an exception case because of inheritance.
+    public static Func<float, float> TimeStateChange;
 }

@@ -13,44 +13,26 @@ public class HellBlade : Timeable
     {
         base.Awake();
 
-        prevTimeState = 0;
+        prevTimeState = timeOffset;
         initialEuler = transform.eulerAngles;
+
+        //Offset if AfterPI;
+        OnTimeStateChange(0);
     }
 
-    protected override void OnTimeStateChange(float timeState)
+    protected override float OnTimeStateChange(float timeState)
     {
         if (!shouldRespondToTimeChange)
         {
-            return;
+            return -1;
         }
+
+        timeState = base.OnTimeStateChange(timeState);
 
         float delta = timeState - prevTimeState;
         transform.eulerAngles += Vector3.forward * delta * angularSpeed;
         prevTimeState = timeState;
+
+        return 0;
     }
-
-    // protected override void OnAllTimeablesShouldDefault(float timeDefault)
-    // {
-    //     base.OnAllTimeablesShouldDefault(timeDefault);
-    //     print("HellBlade default");
-    //     StartCoroutine(ReturnToDefault(timeDefault));
-    // }
-
-    // private IEnumerator ReturnToDefault(float timeDefault)
-    // { 
-    //     shouldRespondToTimeChange = false;
-    //     float lerpParam = 0;
-    //     Vector3 prevEuler = transform.eulerAngles;
-    //     while (lerpParam < 1)
-    //     {
-    //         lerpParam += Time.deltaTime / timeDefault;
-    //         transform.eulerAngles = Vector3.Lerp(
-    //             prevEuler,
-    //             initialEuler,
-    //             CustomMath.EaseOut(lerpParam)
-    //         );
-    //         yield return null;
-    //     }
-    //     shouldRespondToTimeChange = true;
-    // }
 }

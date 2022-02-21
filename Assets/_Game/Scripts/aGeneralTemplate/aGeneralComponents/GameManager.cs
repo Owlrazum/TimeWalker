@@ -4,9 +4,11 @@ namespace GeneralTemplate
 {
     // Fail should to loop.
     // Две частоты у всех ловушек.
+    
+    //MaybeDone:
     // Customized UI with the clock instead of button.
 
-    // one big wave; // WOOOOOOOOH;
+    // one big wave; // WOOOOOOOOH Made It!;
 
     // Build.
 

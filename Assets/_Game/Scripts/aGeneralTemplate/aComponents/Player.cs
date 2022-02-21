@@ -119,6 +119,7 @@ public class Player : AnimatedPlayerCharacter
             characterController.Move(currentMoveSpeed * ratioToUsualSpeed * Time.deltaTime * -transform.forward);
             yield return null;
         }
+        isDeathEventRaised = false;
     }
 
     private void OnTriggerEnter(Collider other)

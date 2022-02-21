@@ -7,9 +7,6 @@ public class SpikeTrap : Timeable
     private float maxHeight;
 
     [SerializeField]
-    private float offset;
-
-    [SerializeField]
     [Tooltip("Used for the sin wave")]
     private float divisorForPI = 12;
 
@@ -22,7 +19,8 @@ public class SpikeTrap : Timeable
     private float affectRange;
 
     [SerializeField]
-    [Tooltip("Uses its own hierarchy for the logic. Each child is assumed as the row of the spikes.")]
+    [Tooltip("Uses its own hierarchy for the logic." +
+            "Each child is assumed as the row of the spikes.")]
     private string readTooltip;
 
     private float totalRowWiseDistance;
@@ -30,7 +28,6 @@ public class SpikeTrap : Timeable
     private float startHeight;
 
     private Transform[] spikeRows;
-    private float[] timeStateRange;
 
     protected override void Awake()
     {
@@ -39,23 +36,26 @@ public class SpikeTrap : Timeable
         float deltaRange = 1.0f / transform.childCount;
 
         spikeRows = new Transform[transform.childCount];
-        timeStateRange = new float[transform.childCount];
         for (int i = 0; i < transform.childCount; i++)
         {
             spikeRows[i] = transform.GetChild(i);
-            timeStateRange[i] = (i + 1) * deltaRange;
         }
 
         startHeight = spikeRows[0].transform.position.y;
         totalRowWiseDistance = spikeRows.Length * distanceBetweenRows;
+        
+        //Offset if AfterPI;
+        OnTimeStateChange(0);
     }
 
-    protected override void OnTimeStateChange(float timeState)
+    protected override float OnTimeStateChange(float timeState)
     {
         if (!shouldRespondToTimeChange)
         {
-            return;
+            return -1;
         }
+
+        timeState = base.OnTimeStateChange(timeState);
 
         timeState *= 2;
         timeState -= 0.5f;
@@ -66,10 +66,10 @@ public class SpikeTrap : Timeable
             float distParam = distanceFromOrigin / totalRowWiseDistance;
             //distParam = CustomMath.Flip(distParam);
 
-            Debug.Log(
-                "DistParam " + distParam + "\n" +
-                "TimeState " + timeState + "\n"
-            );
+            // Debug.Log(
+            //     "DistParam " + distParam + "\n" +
+            //     "TimeState " + timeState + "\n"
+            // );
             //Debug.Break();
             float distTimeRelation = Mathf.Abs(distParam - timeState);
             if (distTimeRelation > affectRange)
@@ -84,43 +84,9 @@ public class SpikeTrap : Timeable
             float lerpParam = Mathf.Sin(angleParam);
             ChangeSpikeRowHeight(spikeRows[i], lerpParam);
         }
+
+        return 0;
     }
-
-    // protected override void OnAllTimeablesShouldDefault(float timeDefault)
-    // {
-    //     base.OnAllTimeablesShouldDefault(timeDefault);
-
-    //     foreach (Transform spikeRow in spikeRows)
-    //     { 
-    //         Vector3 prevPos = spikeRow.transform.position;
-    //         if (prevPos.y == startHeight)
-    //         {
-    //             continue;
-    //         }
-
-    //         StartCoroutine(ReturnToDefaultSpikeRow(timeDefault, spikeRow));
-    //     }
-    // }
-
-    // private IEnumerator ReturnToDefaultSpikeRow(float timeDefault, Transform spikeRow)
-    // { 
-    //     shouldRespondToTimeChange = false;
-    //     float lerpParam = 0;
-    //     Vector3 prevPos = spikeRow.position;
-    //     Vector3 startPos = spikeRow.position;
-    //     startPos.y = startHeight;
-    //     while (lerpParam < 1)
-    //     {
-    //         lerpParam += Time.deltaTime / timeDefault;
-    //         spikeRow.position = Vector3.Lerp(
-    //             prevPos,
-    //             startPos,
-    //             CustomMath.EaseOut(lerpParam)
-    //         );
-    //         yield return null;
-    //     }
-    //     shouldRespondToTimeChange = true;
-    // }
 
     private void ChangeSpikeRowHeight(Transform spikeRow, float lerpParam)
     {

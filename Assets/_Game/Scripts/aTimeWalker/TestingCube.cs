@@ -18,9 +18,9 @@ public class TestingCube : Timeable
         endingPosition = endingTransform.position;
     }
 
-    protected override void OnTimeStateChange(float timeState)
+    protected override float OnTimeStateChange(float timeState)
     {
-        base.OnTimeStateChange(timeState);
+        timeState = base.OnTimeStateChange(timeState);
         if (timeState <= 0.5f)
         {
             timeState *= 2;
@@ -39,5 +39,7 @@ public class TestingCube : Timeable
                 CustomMath.EaseInOut(timeState)
             );
         }
+
+        return timeState;
     }
 }

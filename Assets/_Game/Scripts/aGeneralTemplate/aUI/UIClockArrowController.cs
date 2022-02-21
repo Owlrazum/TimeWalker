@@ -63,12 +63,6 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         StartCoroutine(RevertingTime());
     }
 
-    // private void OnPlayerRevertedToStartPos()
-    // {
-    //     shouldTimePass = true;
-    //     shouldRespondToInput = true;
-    // }
-
     private void Update()
     {
         if (shouldTimePass)
@@ -120,6 +114,16 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         currentAngle = angle;
         EventsContainer.ClockArrowMoved?.Invoke(currentAngle);
         arrowRectTransform.eulerAngles = new Vector3(0, 0, currentAngle * Mathf.Rad2Deg);
+    }
+
+    public void OnPointerUp(PointerEventData data)
+    {
+        if (!shouldRespondToInput)
+        {
+            return;
+        }
+
+        shouldTimePass = true;
     }
 
     private float ComputePressAngle(Vector3 pressPos)
@@ -181,16 +185,6 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         arrowRectTransform.eulerAngles = new Vector3(0, 0, currentAngle * Mathf.Rad2Deg);
     }
 
-    public void OnPointerUp(PointerEventData data)
-    {
-        if (!shouldRespondToInput)
-        {
-            return;
-        }
-
-        shouldTimePass = true;
-    }
-
     private IEnumerator RevertingTime()
     {
         int revolutionsCount = (int)totalAddedAngle / 360;
@@ -225,11 +219,17 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
             yield return null;
         }
         arrowRectTransform.eulerAngles = Vector3.zero;
+
+        ContinueTime();
     }
 
-    private bool isPlayerStartedDecelerating;
-    private void OnPlayerStartedDecelerating()
+    /// <summary>
+    /// Called after reverting time
+    /// </summary>
+    private void ContinueTime()
     {
-        isPlayerStartedDecelerating = true;
+        shouldTimePass = true;
+        shouldRespondToInput = true;
+        totalAddedAngle = 0;
     }
 }
