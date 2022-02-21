@@ -5,18 +5,15 @@ public class HellBlade : Timeable
 {
     [SerializeField]
     private float angularSpeed = 90;
-    private float prevTimeState;
 
-    private Vector3 initialEuler;
+    private float prevTimeState;
 
     protected override void Awake()
     {
         base.Awake();
 
-        prevTimeState = timeOffset;
-        initialEuler = transform.eulerAngles;
-
         //Offset if AfterPI;
+        prevTimeState = 0;
         OnTimeStateChange(0);
     }
 

@@ -74,7 +74,7 @@ public class Player : AnimatedPlayerCharacter
                     posOfMaxSpeed = transform.position;
                 }
             }
-            //characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
+            characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
             yield return null;
         }
     }

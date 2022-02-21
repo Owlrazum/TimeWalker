@@ -29,13 +29,8 @@ public class Hammer : Timeable
             return -1;
         }
 
-        float prevTimeState = timeState;
         timeState = base.OnTimeStateChange(timeState);
-        if (Mathf.Abs(timeState - prevTimeState) == 0.5f)
-        { 
-            print("It is modified");
-        }
-
+        
         if (timeState < 0.5f)
         {
             timeState *= 2;
