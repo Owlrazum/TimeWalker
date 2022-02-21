@@ -68,7 +68,6 @@ public class Player : AnimatedPlayerCharacter
                 currentMoveSpeed += moveSpeed * Time.deltaTime;
                 if (currentMoveSpeed >= moveSpeed)
                 {
-                    Debug.DrawRay(transform.position, Vector3.up * 10, Color.green, 100, false);
                     shouldAccelerate = false;
                     currentMoveSpeed = moveSpeed;
                     posOfMaxSpeed = transform.position;
@@ -102,7 +101,6 @@ public class Player : AnimatedPlayerCharacter
         {
             if (transform.position.z <= posOfMaxSpeed.z)
             {
-                Debug.DrawRay(transform.position, Vector3.down * currentMoveSpeed, Color.cyan, 10, false);
                 SetAnimationState(AnimationState.Idle);
                 //currentMoveSpeed += moveSpeed * Time.deltaTime;
                 
@@ -129,7 +127,6 @@ public class Player : AnimatedPlayerCharacter
             if (!isDeathEventRaised)
             {
                 isDeathEventRaised = true;
-                print("PlayerCollided with death");
                 EventsContainer.PlayerCollidedWithDeath?.Invoke();
             }
         }

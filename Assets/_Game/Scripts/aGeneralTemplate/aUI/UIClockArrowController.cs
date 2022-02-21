@@ -24,35 +24,30 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
 
     private RectTransform rect;
 
-    private bool isPositive;
     private bool shouldTimePass;
     private bool shouldRespondToInput;
 
-    private float currentAngle;
-    private float totalAddedAngle;
+    private float currentAngleRad;
+    private float totalAddedAngleDeg;
 
-    private float angleToApproach;
+    private float angleToApproachRad;
     private bool haveApproached;
 
     private void Awake()
     {
         rect = GetComponent<RectTransform>();
-        timer = 0;
-        isPositive = false;
         shouldTimePass = true;
         shouldRespondToInput = true;
 
-        currentAngle = 0;
-        totalAddedAngle = 0;
+        currentAngleRad = 0;
+        totalAddedAngleDeg = 0;
 
         EventsContainer.PlayerCollidedWithDeath += OnPlayerCollidedWithDeath;
-        //EventsContainer.PlayerRevertedToStartPos += OnPlayerRevertedToStartPos;
     }
 
     private void OnDestroy()
     { 
         EventsContainer.PlayerCollidedWithDeath -= OnPlayerCollidedWithDeath;
-        //EventsContainer.PlayerRevertedToStartPos -= OnPlayerRevertedToStartPos;
     }
 
     private void OnPlayerCollidedWithDeath()
@@ -65,14 +60,14 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
 
     private void Update()
     {
-        if (shouldTimePass)
+        if (false)
         { 
-            float step = speedOfUsualTimeDeg * Time.deltaTime;
-            Vector3 toAdd = new Vector3(0, 0, -step);
-            arrowRectTransform.eulerAngles += toAdd;
-            totalAddedAngle += step;
+            float stepDeg = speedOfUsualTimeDeg * Time.deltaTime;
+            Vector3 toAddDeg = new Vector3(0, 0, -stepDeg);
+            arrowRectTransform.eulerAngles += toAddDeg;
+            totalAddedAngleDeg += stepDeg;
 
-            currentAngle = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
+            currentAngleRad = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
 
             EventsContainer.ClockArrowMoved?.Invoke(arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad);
         }
@@ -90,7 +85,6 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         OnDrag(data);
     }
 
-    private float timer; 
     public void OnDrag(PointerEventData data)
     {
         if (!shouldRespondToInput)
@@ -98,22 +92,22 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
             return;
         }
 
-        float angle = ComputePressAngle(data.position);
-        totalAddedAngle += angle - currentAngle;
+        float angleRad = ComputePressAngleRad(data.position);
+        totalAddedAngleDeg += (angleRad - currentAngleRad) * Mathf.Rad2Deg;
 
-        if (!haveApproached)
-        {
-            angleToApproach = angle;
-            if (!isApproaching)
-            {
-                StartCoroutine(ApproachingCoroutine());
-            }
-            print("Returning");
-            return;
-        }
-        currentAngle = angle;
-        EventsContainer.ClockArrowMoved?.Invoke(currentAngle);
-        arrowRectTransform.eulerAngles = new Vector3(0, 0, currentAngle * Mathf.Rad2Deg);
+        // if (!haveApproached)
+        // {
+        //     angleToApproachRad = angleRad;
+        //     if (!isApproaching)
+        //     {
+        //         StartCoroutine(ApproachingCoroutine());
+        //     }
+        //     print("Returning");
+        //     return;
+        // }
+        currentAngleRad = angleRad;
+        EventsContainer.ClockArrowMoved?.Invoke(currentAngleRad);
+        arrowRectTransform.eulerAngles = new Vector3(0, 0, currentAngleRad * Mathf.Rad2Deg);
     }
 
     public void OnPointerUp(PointerEventData data)
@@ -126,7 +120,7 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         shouldTimePass = true;
     }
 
-    private float ComputePressAngle(Vector3 pressPos)
+    private float ComputePressAngleRad(Vector3 pressPos)
     { 
         Vector2 origin = Vector2.up;
 
@@ -138,14 +132,14 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         Vector3 pressDirection = pressPos - arrowRectTransform.position;
         pressDirection = Quaternion.Euler(0, 0, 90) * pressDirection; // rotate for atan2
 
-        float angle = Mathf.Atan2(pressDirection.y, pressDirection.x);
-        angle += Mathf.PI;
-        if (angle < 0)
+        float angleRad = Mathf.Atan2(pressDirection.y, pressDirection.x);
+        angleRad += Mathf.PI;
+        if (angleRad < 0)
         {
-            angle = 2 * Mathf.PI + angle;
+            angleRad = 2 * Mathf.PI + angleRad;
         }
         
-        return angle;
+        return angleRad;
     }
 
     private bool isApproaching;
@@ -155,72 +149,85 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
         while(!haveApproached)
         {
             print("Approaching");
-            ApproachTouchPos(angleToApproach);
+            ApproachTouchPos(angleToApproachRad);
             yield return null;
         }
         isApproaching = false;
     }
 
-    private void ApproachTouchPos(float angle)
+    private void ApproachTouchPos(float angleRad)
     {
         float sign = 1;
-        if (currentAngle > angle)
+        if (currentAngleRad > angleRad)
         {
             sign = -1;
         }
-        currentAngle += sign * speedOfApproachRad * Time.deltaTime;
-        if (sign > 0 && currentAngle > angle)
+        float prevAngleRad = currentAngleRad;
+        currentAngleRad += sign * speedOfApproachRad * Time.deltaTime;
+        totalAddedAngleDeg += (currentAngleRad - prevAngleRad) * Mathf.Rad2Deg;
+        if (sign > 0 && currentAngleRad > angleRad
+            ||
+            sign < 0 && currentAngleRad < angleRad)
         {
             haveApproached = true;
-            currentAngle = angle;
+            totalAddedAngleDeg += (angleRad - currentAngleRad) * Mathf.Rad2Deg;
+            currentAngleRad = angleRad;
         }
-        else if (sign < 0 && currentAngle < angle)
-        {
-            haveApproached = true;
-            currentAngle = angle;
-        }
-        //print("cur : " + currentAngle + "\nappr " + angle);
 
-        EventsContainer.ClockArrowMoved?.Invoke(currentAngle);
-        arrowRectTransform.eulerAngles = new Vector3(0, 0, currentAngle * Mathf.Rad2Deg);
+        EventsContainer.ClockArrowMoved?.Invoke(currentAngleRad);
+        arrowRectTransform.eulerAngles = new Vector3(0, 0, currentAngleRad * Mathf.Rad2Deg);
     }
 
     private IEnumerator RevertingTime()
     {
-        int revolutionsCount = (int)totalAddedAngle / 360;
-        float remainedAngle = 0;
+        int revolutionsCount = (int)(totalAddedAngleDeg / 360);
+        float remainedAngleDeg = 0;
 
-        for (int i = 0; i < revolutionsCount; i++)
+        float revoultionStartAngleDeg = totalAddedAngleDeg % 360;
+
+        for (int i = 0; i < revolutionsCount + 1; i++)
         {
-            remainedAngle = 360;
-            while (remainedAngle > 0)
+            if (i != revolutionsCount)
             { 
-                float step = speedOfRevertingDeg * Time.deltaTime;
-                arrowRectTransform.eulerAngles -= new Vector3(0, 0, -step);
-
-                currentAngle = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
-                EventsContainer.ClockArrowMoved?.Invoke(currentAngle);
-
-                remainedAngle -= step;
+                remainedAngleDeg = 360;
+            }
+            else
+            { 
+                remainedAngleDeg = revoultionStartAngleDeg;
+            }
+            while (remainedAngleDeg > 0)
+            { 
+                float stepDeg = speedOfRevertingDeg * Time.deltaTime;
+                remainedAngleDeg -= stepDeg;
+                if (remainedAngleDeg >= 0)
+                {
+                    arrowRectTransform.eulerAngles -= new Vector3(0, 0, -stepDeg);
+                    currentAngleRad = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
+                    EventsContainer.ClockArrowMoved?.Invoke(currentAngleRad);
+                }
+                else
+                {
+                    if (i != revolutionsCount)
+                    { 
+                        remainedAngleDeg = 0;
+                        arrowRectTransform.eulerAngles = -Vector3.forward * revoultionStartAngleDeg;
+                        currentAngleRad = revoultionStartAngleDeg * Mathf.Deg2Rad;
+                        EventsContainer.ClockArrowMoved?.Invoke(currentAngleRad);
+                    }
+                    // exit code
+                    else
+                    {
+                        arrowRectTransform.eulerAngles = Vector3.zero;
+                        currentAngleRad = 0;
+                        totalAddedAngleDeg = 0;
+                        EventsContainer.ClockArrowMoved?.Invoke(currentAngleRad);
+                        ContinueTime();
+                        yield break;
+                    }
+                }
                 yield return null;
             }
         }
-
-        remainedAngle = totalAddedAngle % 360;
-        while (remainedAngle > 0)
-        {
-            float step = speedOfRevertingDeg * Time.deltaTime;
-            arrowRectTransform.eulerAngles -= new Vector3(0, 0, -step);
-
-            currentAngle = arrowRectTransform.eulerAngles.z * Mathf.Deg2Rad;
-            EventsContainer.ClockArrowMoved?.Invoke(currentAngle);
-
-            remainedAngle -= step;
-            yield return null;
-        }
-        arrowRectTransform.eulerAngles = Vector3.zero;
-
-        ContinueTime();
     }
 
     /// <summary>
@@ -230,6 +237,5 @@ public class UIClockArrowController : MonoBehaviour, IPointerDownHandler, IDragH
     {
         shouldTimePass = true;
         shouldRespondToInput = true;
-        totalAddedAngle = 0;
     }
 }

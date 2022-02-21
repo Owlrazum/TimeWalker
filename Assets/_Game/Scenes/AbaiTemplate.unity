@@ -7917,7 +7917,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   arrowRectTransform: {fileID: 518437438}
   speedOfUsualTimeDeg: 90
-  speedOfApproachRad: 1
+  speedOfApproachRad: 2
   speedOfRevertingDeg: 270
   approachEpsilon: 0.00001
 --- !u!1 &1058587954
@@ -10466,7 +10466,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2048007059213224713, guid: 1c0c165a8340942c1bc702f8913f0144, type: 3}
       propertyPath: periodOfFreePassage
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2048007059213224718, guid: 1c0c165a8340942c1bc702f8913f0144, type: 3}
       propertyPath: m_RootOrder
@@ -10681,7 +10681,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2048007059213224713, guid: 1c0c165a8340942c1bc702f8913f0144, type: 3}
       propertyPath: periodOfFreePassage
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2048007059213224718, guid: 1c0c165a8340942c1bc702f8913f0144, type: 3}
       propertyPath: m_RootOrder
@@ -11402,6 +11402,10 @@ PrefabInstance:
     - target: {fileID: 2048007059213224712, guid: 1c0c165a8340942c1bc702f8913f0144, type: 3}
       propertyPath: m_Name
       value: HellBlade
+      objectReference: {fileID: 0}
+    - target: {fileID: 2048007059213224713, guid: 1c0c165a8340942c1bc702f8913f0144, type: 3}
+      propertyPath: periodOfFreePassage
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2048007059213224718, guid: 1c0c165a8340942c1bc702f8913f0144, type: 3}
       propertyPath: m_RootOrder
