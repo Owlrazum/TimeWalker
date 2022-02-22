@@ -6164,6 +6164,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   speedOfUsualTimeFlow: 0.25
   speedOfRevertingTimeFlow: 0.75
+  maxClockTimeChange: 0.75
 --- !u!4 &421768847
 Transform:
   m_ObjectHideFlags: 0
@@ -6176,7 +6177,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 10
+  m_RootOrder: 11
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &438453134
 GameObject:
@@ -10824,7 +10825,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 11
+  m_RootOrder: 10
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &2068204161
 GameObject:

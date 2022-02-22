@@ -57,8 +57,8 @@ namespace Generators
             MeshFilter meshFilter = GetComponent<MeshFilter>();
             meshFilter.mesh = mesh;
 
-            AssetDatabase.CreateAsset(mesh, "Assets/_Game/Meshes/Hexagon.asset");
-            AssetDatabase.SaveAssets();
+            // AssetDatabase.CreateAsset(mesh, "Assets/_Game/Meshes/Hexagon.asset");
+            // AssetDatabase.SaveAssets();
         }
     }
 }

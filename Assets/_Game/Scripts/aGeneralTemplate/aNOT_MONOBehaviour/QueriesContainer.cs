@@ -55,4 +55,17 @@ public static class QueriesContainer
 
         return RevertToUsualTimeRelation.Invoke();
     }
+
+    public static Func<float> MaxClockTimeChange;
+    public static float QeuryMaxClockTimeInFrame()
+    { 
+        #if UNITY_EDITOR
+        if (MaxClockTimeChange.GetInvocationList().Length != 1)
+        {
+            throw new NotSupportedException("There should be only one subscription");
+        }
+#endif        
+
+        return MaxClockTimeChange.Invoke();
+    }
 }

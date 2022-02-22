@@ -3,6 +3,7 @@ using UnityEngine;
 
 public enum TimeFlowType
 { 
+    None,
     Usual,
     PlayerControlled,
     Reverting
@@ -16,6 +17,9 @@ public class TimeController : MonoBehaviour
 
     [SerializeField]
     private float speedOfRevertingTimeFlow;
+
+    [SerializeField]
+    private float maxClockTimeChange;
 
     private TimeFlowType timeFlow;
     private IEnumerator timeFlowCoroutine;
@@ -33,6 +37,7 @@ public class TimeController : MonoBehaviour
         EventsContainer.PlayerCollidedWithDeath += OnPlayerCollidedWithDeath;
 
         QueriesContainer.RevertToUsualTimeRelation += GetRevertToUsualTimeRelation;
+        QueriesContainer.MaxClockTimeChange += GetMaxClockTimeChange;
 
         SetTimeFlow(TimeFlowType.Usual);
     }
@@ -46,6 +51,7 @@ public class TimeController : MonoBehaviour
         EventsContainer.PlayerCollidedWithDeath -= OnPlayerCollidedWithDeath;
 
         QueriesContainer.RevertToUsualTimeRelation -= GetRevertToUsualTimeRelation;
+        QueriesContainer.MaxClockTimeChange -= GetMaxClockTimeChange;
     }
 
     private void OnClockInputStart()
@@ -60,7 +66,7 @@ public class TimeController : MonoBehaviour
 
         currentClockTime.UpdateWithAngleRad(angleRad);
         //print("-=-=-=ClockTime " + currentClockTime.GetFractionPart() + "\n" + "AngleRad " + angleRad);
-        EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetFractionPart());
+        EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
     }
 
     private void OnClockInputEnd()
@@ -76,6 +82,11 @@ public class TimeController : MonoBehaviour
     private float GetRevertToUsualTimeRelation()
     {
         return speedOfRevertingTimeFlow / speedOfUsualTimeFlow;
+    }
+
+    private float GetMaxClockTimeChange()
+    {
+        return maxClockTimeChange;
     }
 
     private void SetTimeFlow(TimeFlowType newTimeFlow)
@@ -125,8 +136,8 @@ public class TimeController : MonoBehaviour
         while (true)
         { 
             float step = speedOfUsualTimeFlow * Time.deltaTime;
-            //currentClockTime.UpdateTimeWithDelta(step);
-            //EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetFractionPart());
+            currentClockTime.UpdateTimeWithDelta(step);
+            EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
             yield return null;
         }
     }
@@ -140,14 +151,14 @@ public class TimeController : MonoBehaviour
         {
             float delta = speedOfRevertingTimeFlow * Time.deltaTime;
             delta = currentClockTime.UpdateDeltaForReverting(delta);
-            Debug.Log("Delta " + delta + " PrevTime " + currentClockTime.GetFractionPart());
+            Debug.Log("Delta " + delta + " PrevTime " + currentClockTime.GetTime());
             currentClockTime.UpdateTimeWithDelta(delta);
-            Debug.Log("Time " + currentClockTime.GetFractionPart());
-            EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetFractionPart());
+            Debug.Log("Time " + currentClockTime.GetTime());
+            EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
             yield return null;
         }
         currentClockTime.Reset();
-        EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetFractionPart());
+        EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
         SetTimeFlow(TimeFlowType.Usual);
     }
 }
