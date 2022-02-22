@@ -41,7 +41,6 @@ public class AnimatedPlayerCharacter : MonoBehaviour
                 animator.SetInteger("AnimationState", 1);
                 break;
             case AnimationState.ReverseRunning:
-                print("ReverseRunning Animatoin state set");
                 animator.SetInteger("AnimationState", 2);
                 animator.applyRootMotion = false;
                 break;

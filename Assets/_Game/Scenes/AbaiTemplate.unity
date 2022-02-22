@@ -6162,7 +6162,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3da1566d4a7a2430faedcff79967ac37, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  timeDefault: 1
+  speedOfUsualTimeFlow: 0.25
+  speedOfRevertingTimeFlow: 0.75
 --- !u!4 &421768847
 Transform:
   m_ObjectHideFlags: 0
@@ -7108,6 +7109,10 @@ PrefabInstance:
       value: 720
       objectReference: {fileID: 0}
     - target: {fileID: 8991057488532832354, guid: a3106c198e43442cb8a06cdbe05db948, type: 3}
+      propertyPath: editorShouldMove
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8991057488532832354, guid: a3106c198e43442cb8a06cdbe05db948, type: 3}
       propertyPath: deathLayer.m_LayerIndex
       value: 6
       objectReference: {fileID: 0}
@@ -7916,10 +7921,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   arrowRectTransform: {fileID: 518437438}
-  speedOfUsualTimeDeg: 90
   speedOfApproachRad: 2
-  speedOfRevertingDeg: 270
-  approachEpsilon: 0.00001
 --- !u!1 &1058587954
 GameObject:
   m_ObjectHideFlags: 0

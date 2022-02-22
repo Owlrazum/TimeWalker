@@ -42,4 +42,17 @@ public static class QueriesContainer
 
         return PlayerMoveSpeed.Invoke();
     }
+
+    public static Func<float> RevertToUsualTimeRelation;
+    public static float QueryRevertToUsualTimeRelation()
+    { 
+#if UNITY_EDITOR
+        if (RevertToUsualTimeRelation.GetInvocationList().Length != 1)
+        {
+            throw new NotSupportedException("There should be only one subscription");
+        }
+#endif        
+
+        return RevertToUsualTimeRelation.Invoke();
+    }
 }

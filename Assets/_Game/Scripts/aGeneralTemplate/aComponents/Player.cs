@@ -10,6 +10,9 @@ public class Player : AnimatedPlayerCharacter
     private float moveSpeed;
 
     [SerializeField]
+    private bool editorShouldMove;
+
+    [SerializeField]
     private SingleUnityLayer deathLayer;
 
     private CharacterController characterController;
@@ -25,7 +28,7 @@ public class Player : AnimatedPlayerCharacter
         EventsContainer.PlayerShouldStartMoving += StartMoving;
         EventsContainer.PlayerShouldStartMoving?.Invoke();
 
-        EventsContainer.PlayerShouldStartReverting += StartReverting;
+        EventsContainer.RevertingTimeFlow += OnRevertingTimeFlow;
 
         QueriesContainer.PlayerMoveSpeed += GetMoveSpeed;
 
@@ -36,7 +39,7 @@ public class Player : AnimatedPlayerCharacter
     private void OnDestroy()
     { 
         EventsContainer.PlayerShouldStartMoving -= StartMoving;
-        EventsContainer.PlayerShouldStartReverting -= StartReverting;
+        EventsContainer.RevertingTimeFlow -= OnRevertingTimeFlow;
         
         QueriesContainer.PlayerMoveSpeed -= GetMoveSpeed;
     }
@@ -73,7 +76,10 @@ public class Player : AnimatedPlayerCharacter
                     posOfMaxSpeed = transform.position;
                 }
             }
-            characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
+            if (editorShouldMove)
+            { 
+                characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
+            }
             yield return null;
         }
     }
@@ -84,8 +90,9 @@ public class Player : AnimatedPlayerCharacter
     }
 
     private bool isReverseMoving;
-    private void StartReverting(float ratioToUsualSpeed)
+    private void OnRevertingTimeFlow()
     {
+        float ratioToUsualSpeed = QueriesContainer.QueryRevertToUsualTimeRelation();
         isMoving = false;
         SetAnimationState(AnimationState.ReverseRunning);
         SetReverseRunningAnimationSpeed(-ratioToUsualSpeed);

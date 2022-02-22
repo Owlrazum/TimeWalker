@@ -20,7 +20,7 @@ public class Timeable : MonoBehaviour
     {
         shouldRespondToTimeChange = true;
 
-        EventsContainer.TimeStateChange += OnTimeStateChange;
+        EventsContainer.ClockTimeChange += OnTimeStateChange;
         //EventsContainer.AllTimeablesShouldDefault += OnAllTimeablesShouldDefault;
 
         if (periodOfFreePassage == PeriodOfFreePassageType.AfterPI)
@@ -31,7 +31,7 @@ public class Timeable : MonoBehaviour
 
     protected virtual void OnDestroy()
     {
-        EventsContainer.TimeStateChange -= OnTimeStateChange;
+        EventsContainer.ClockTimeChange -= OnTimeStateChange;
         //EventsContainer.AllTimeablesShouldDefault -= OnAllTimeablesShouldDefault;
     }
 
