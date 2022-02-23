@@ -74,6 +74,7 @@ public class SpikeTrap : Timeable
             float distTimeRelation = Mathf.Abs(distParam - timeState);
             if (distTimeRelation > affectRange)
             {
+                ChangeSpikeRowHeight(spikeRows[i], 0);
                 continue;
             }
 

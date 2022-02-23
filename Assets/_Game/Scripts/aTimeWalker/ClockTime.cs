@@ -9,12 +9,21 @@ using UnityEngine;
 /// </summary>
 public class ClockTime
 {
-    private float time;
+    private float clockTime;
     private bool isPositive;
+
+    private AnimationCurve revertingAnimation;
+    private float startTime;
+    private float currentTime;
+    private Keyframe keyFrame;
 
     public ClockTime()
     {
         isPositive = true;
+        revertingAnimation = new AnimationCurve();
+        keyFrame = new Keyframe(0, 0);
+        revertingAnimation.AddKey(keyFrame);
+        startTime = Time.time;
     }
 
     public float GetTime()
@@ -29,10 +38,23 @@ public class ClockTime
         }
     }
 
+    public AnimationCurve GetRevertingAnimation()
+    {
+        return revertingAnimation;
+    }
+
+    private void RecordClockTime()
+    { 
+        keyFrame.time = Time.time - startTime;
+        keyFrame.value = GetTime();
+        revertingAnimation.AddKey(keyFrame);
+    }
+
     public void UpdateTimeWithDelta(float timeDelta)
     {
-        time += timeDelta;
-        if (time > 0)
+        clockTime += timeDelta;
+        RecordClockTime();
+        if (clockTime > 0)
         {
             isPositive = true;
         }
@@ -53,6 +75,7 @@ public class ClockTime
         {
             NegativeUpdateWithAngleRad(angleTime);
         }
+        RecordClockTime();
     }
 
     private void PositiveUpdateWithAngleRad(float angleTime)
@@ -60,20 +83,20 @@ public class ClockTime
         float fractionPart = GetFractionPart();
         float delta = angleTime - fractionPart;
 //        Debug.Log("AngleTime " + angleTime + "FractionPart " + fractionPart + " Delta " + delta);
-        time = GetRevolutionsCount() + angleTime;
+        clockTime = GetRevolutionsCount() + angleTime;
         if (Mathf.Abs(delta) > QueriesContainer.QeuryMaxClockTimeInFrame())
         {
             if (delta < 0)
             {
-                time++;
+                clockTime++;
             }
             else if (GetRevolutionsCount() > 0 && delta > 0)
             {
-                time--;
+                clockTime--;
             }
             else
             { 
-                time = -angleTime;
+                clockTime = -angleTime;
 
                 Debug.Log("C2 " + isPositive);
                 isPositive = false;
@@ -88,20 +111,20 @@ public class ClockTime
         angleTime = CustomMath.Flip(angleTime);
         float fractionPart = GetFractionPart();
         float delta = angleTime - fractionPart;
-        time = GetRevolutionsCount() - angleTime;
+        clockTime = GetRevolutionsCount() - angleTime;
         if (Mathf.Abs(delta) > QueriesContainer.QeuryMaxClockTimeInFrame())
         {
             if (delta < 0)
             {
-                time--;
+                clockTime--;
             }
             else if (GetRevolutionsCount() > 0 && delta > 0)
             {
-                time++;
+                clockTime++;
             }
             else
             { 
-                time = angleTime;
+                clockTime = angleTime;
                 Debug.Log("C2 " + isPositive);
                 isPositive = true;
             }
@@ -112,17 +135,17 @@ public class ClockTime
 
     public int GetRevolutionsCount()
     {
-        return (int)(time);
+        return (int)(clockTime);
     }
 
     private float GetFractionPart()
     { 
-        return Mathf.Abs(time - (int)(time));
+        return Mathf.Abs(clockTime - (int)(clockTime));
     }
 
     public Func<bool> GetCheckForRevertCompletion()
     {
-        if (time > 0)
+        if (clockTime > 0)
         {
             return IsTimeNegative;
         }
@@ -134,17 +157,17 @@ public class ClockTime
 
     private bool IsTimePositive()
     {
-        return time >= 0;
+        return clockTime >= 0;
     }
 
     private bool IsTimeNegative()
     {
-        return time <= 0;
+        return clockTime <= 0;
     }
 
     public float UpdateDeltaForReverting(float delta)
     {
-        if (time > 0)
+        if (clockTime > 0)
         {
             return -delta;
         }
@@ -153,7 +176,16 @@ public class ClockTime
 
     public void Reset()
     {
-        time = 0;
+        clockTime = 0;
         isPositive = true;
+        ResetRevertingAnimation();
+    }
+
+    private void ResetRevertingAnimation()
+    { 
+        startTime = Time.time;
+        keyFrame = new Keyframe(0, 0);
+        revertingAnimation = new AnimationCurve();
+        revertingAnimation.AddKey(keyFrame);
     }
 }

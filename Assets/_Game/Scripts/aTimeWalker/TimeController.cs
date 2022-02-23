@@ -144,21 +144,30 @@ public class TimeController : MonoBehaviour
 
     private IEnumerator RevertingTime()
     {
-        var checkRevertCompletion = currentClockTime.GetCheckForRevertCompletion();
-        print(checkRevertCompletion.GetInvocationList()[0].Method.Name);
-        //Debug.Break();
-        while (!checkRevertCompletion.Invoke())
+        AnimationCurve revertingAnimation = currentClockTime.GetRevertingAnimation();
+        float revertTime = revertingAnimation.keys[revertingAnimation.length - 1].time;
+        while (revertTime > 0)
         {
-            float delta = speedOfRevertingTimeFlow * Time.deltaTime;
-            delta = currentClockTime.UpdateDeltaForReverting(delta);
-            Debug.Log("Delta " + delta + " PrevTime " + currentClockTime.GetTime());
-            currentClockTime.UpdateTimeWithDelta(delta);
-            Debug.Log("Time " + currentClockTime.GetTime());
-            EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
+            float revertClockTime = revertingAnimation.Evaluate(revertTime);
+            EventsContainer.ClockTimeChange?.Invoke(revertClockTime);
+            revertTime -= Time.deltaTime * 3;
             yield return null;
         }
-        currentClockTime.Reset();
-        EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
-        SetTimeFlow(TimeFlowType.Usual);
+        // var checkRevertCompletion = currentClockTime.GetCheckForRevertCompletion();
+        // print(checkRevertCompletion.GetInvocationList()[0].Method.Name);
+        // //Debug.Break();
+        // while (!checkRevertCompletion.Invoke())
+        // {
+        //     float delta = speedOfRevertingTimeFlow * Time.deltaTime;
+        //     delta = currentClockTime.UpdateDeltaForReverting(delta);
+        //     Debug.Log("Delta " + delta + " PrevTime " + currentClockTime.GetTime());
+        //     currentClockTime.UpdateTimeWithDelta(delta);
+        //     Debug.Log("Time " + currentClockTime.GetTime());
+        //     EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
+        //     yield return null;
+        // }
+        // currentClockTime.Reset();
+        // EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
+        // SetTimeFlow(TimeFlowType.Usual);
     }
 }
