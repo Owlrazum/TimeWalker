@@ -62,10 +62,8 @@ public class TimeController : MonoBehaviour
     private void OnClockInputUpdate(float angleRad)
     {
         float inputClockTime = angleRad / (2 * Mathf.PI);
-        //print("ClockTime " + currentClockTime.GetFractionPart() + "\n" + "AngleRad " + angleRad);
 
         currentClockTime.UpdateWithAngleRad(angleRad);
-        //print("-=-=-=ClockTime " + currentClockTime.GetFractionPart() + "\n" + "AngleRad " + angleRad);
         EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
     }
 
@@ -153,21 +151,8 @@ public class TimeController : MonoBehaviour
             revertTime -= Time.deltaTime * 3;
             yield return null;
         }
-        // var checkRevertCompletion = currentClockTime.GetCheckForRevertCompletion();
-        // print(checkRevertCompletion.GetInvocationList()[0].Method.Name);
-        // //Debug.Break();
-        // while (!checkRevertCompletion.Invoke())
-        // {
-        //     float delta = speedOfRevertingTimeFlow * Time.deltaTime;
-        //     delta = currentClockTime.UpdateDeltaForReverting(delta);
-        //     Debug.Log("Delta " + delta + " PrevTime " + currentClockTime.GetTime());
-        //     currentClockTime.UpdateTimeWithDelta(delta);
-        //     Debug.Log("Time " + currentClockTime.GetTime());
-        //     EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
-        //     yield return null;
-        // }
-        // currentClockTime.Reset();
-        // EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
-        // SetTimeFlow(TimeFlowType.Usual);
+        currentClockTime.Reset();
+        EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
+        SetTimeFlow(TimeFlowType.Usual);
     }
 }
