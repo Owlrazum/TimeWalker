@@ -3450,8 +3450,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 358bdc66ba7344a7cbd07df067446052, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  periodOfFreePassage: 0
   maxHeight: 1
-  offset: 0.2
+  divisorForPI: 12
+  distanceBetweenRows: 1.5
+  affectRange: 0.2
   readTooltip: 
 --- !u!1 &6058793434932539137
 GameObject:

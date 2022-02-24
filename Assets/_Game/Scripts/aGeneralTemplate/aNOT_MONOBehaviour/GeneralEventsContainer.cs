@@ -8,7 +8,8 @@ public static class GeneralEventsContainer
     public static Action GameEnd;
 
     public static Action<LevelData> LevelLoaded;
-    
+    public static Action LevelStart;
+
     public static Action ShouldLoadNextScene;
     public static Action LevelFailed;
     public static Action LevelCompleted;
@@ -20,6 +21,5 @@ public static class GeneralEventsContainer
     public static Action<DragCommand> DragCommanded;
     #endregion
     
-
     public static Action ProgressWasMade;
 }

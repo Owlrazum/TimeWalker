@@ -1,5 +1,7 @@
 using UnityEngine;
 
+using Cinemachine;
+
 namespace GeneralTemplate
 {
     public enum CameraLocation
@@ -12,13 +14,20 @@ namespace GeneralTemplate
         [SerializeField]
         private Camera renderingCamera;
 
+        [SerializeField]
+        private CinemachineVirtualCamera followerCamera;
+
         private void Awake()
         {
+            EventsContainer.PlayerReachedGates += OnPlayerReachedGates;
+
             QueriesContainer.CurrentCameraYaw += GetCameraYaw;
         }
 
         private void OnDisable()
         {
+            EventsContainer.PlayerReachedGates -= OnPlayerReachedGates;
+
             QueriesContainer.CurrentCameraYaw -= GetCameraYaw;
         }
 
@@ -30,6 +39,11 @@ namespace GeneralTemplate
         public Ray GetScreenToWorldRay(Vector2 screenPos)
         {
             return renderingCamera.ScreenPointToRay(screenPos);
+        }
+
+        private void OnPlayerReachedGates()
+        {
+            followerCamera.enabled = false;
         }
     }
 }

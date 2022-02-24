@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace GeneralTemplate
@@ -7,14 +5,6 @@ namespace GeneralTemplate
     /// <summary>
     /// Everything you need to know about level may go here.
     /// </summary>
-    [System.Serializable]
-    public class LevelData
-    {
-        public LevelData()
-        { 
-
-        }
-    }
 
     public class LevelDataHandOver : MonoBehaviour
     {
@@ -25,5 +15,14 @@ namespace GeneralTemplate
         {
             GeneralEventsContainer.LevelLoaded?.Invoke(levelData);
         }
+    }
+}
+
+[System.Serializable]
+public class LevelData
+{
+    public LevelData()
+    { 
+
     }
 }

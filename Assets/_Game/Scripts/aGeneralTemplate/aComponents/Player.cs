@@ -18,17 +18,22 @@ public class Player : AnimatedPlayerCharacter
     private CharacterController characterController;
     private Vector3 posOfMaxSpeed;
     private Vector3 initialPos;
-    private bool isDeathEventRaised;
+    
+    private bool shouldDeathEventRaise;
+
+    private float currentMoveSpeed;
+    private IEnumerator movingCoroutine;
 
     protected override void Awake()
     {
         base.Awake();
         characterController = GetComponent<CharacterController>();
 
-        EventsContainer.PlayerShouldStartMoving += StartMoving;
-        EventsContainer.PlayerShouldStartMoving?.Invoke();
+        GeneralEventsContainer.LevelStart += StartMoving;
 
         EventsContainer.RevertingTimeFlow += OnRevertingTimeFlow;
+
+        EventsContainer.PlayerReachedGates += OnReachedGates;
 
         QueriesContainer.PlayerMoveSpeed += GetMoveSpeed;
 
@@ -37,10 +42,13 @@ public class Player : AnimatedPlayerCharacter
     }
 
     private void OnDestroy()
-    { 
-        EventsContainer.PlayerShouldStartMoving -= StartMoving;
-        EventsContainer.RevertingTimeFlow -= OnRevertingTimeFlow;
+    {
+        GeneralEventsContainer.LevelStart -= StartMoving;
         
+        EventsContainer.RevertingTimeFlow -= OnRevertingTimeFlow;
+
+        EventsContainer.PlayerReachedGates -= OnReachedGates;
+
         QueriesContainer.PlayerMoveSpeed -= GetMoveSpeed;
     }
 
@@ -48,23 +56,23 @@ public class Player : AnimatedPlayerCharacter
     {
         if (animationState != AnimationState.Running)
         {
-            SetAnimationState(AnimationState.Running);
-            StartCoroutine(Moving());
+            shouldDeathEventRaise = true;
+            movingCoroutine = Moving();
+            StartCoroutine(movingCoroutine);
         }
         else
-        { 
+        {
             Debug.LogError("Invalid animation state");
         }
     }
 
-    private bool isMoving;
     private IEnumerator Moving()
     {
-        isMoving = true;
-        float currentMoveSpeed = 0;
+        SetAnimationState(AnimationState.Running);
+        currentMoveSpeed = 0;
         bool shouldAccelerate = true;
 
-        while (isMoving)
+        while (true)
         {
             if (shouldAccelerate)
             {
@@ -77,7 +85,7 @@ public class Player : AnimatedPlayerCharacter
                 }
             }
             if (editorShouldMove)
-            { 
+            {
                 characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
             }
             yield return null;
@@ -89,54 +97,86 @@ public class Player : AnimatedPlayerCharacter
         return moveSpeed;
     }
 
-    private bool isReverseMoving;
     private void OnRevertingTimeFlow()
     {
         float ratioToUsualSpeed = QueriesContainer.QueryRevertToUsualTimeRelation();
-        isMoving = false;
-        SetAnimationState(AnimationState.ReverseRunning);
-        SetReverseRunningAnimationSpeed(-ratioToUsualSpeed);
 
-        StartCoroutine(ReverseMoving(ratioToUsualSpeed));
+        StopCoroutine(movingCoroutine);
+        movingCoroutine = ReverseMoving(ratioToUsualSpeed);
+        StartCoroutine(movingCoroutine);
     }
 
     private IEnumerator ReverseMoving(float ratioToUsualSpeed)
     {
-        isReverseMoving = true;
-        float currentMoveSpeed = moveSpeed;
-        while (isReverseMoving)
+        SetAnimationState(AnimationState.ReverseRunning);
+        SetReverseRunningAnimationSpeed(-ratioToUsualSpeed);
+        currentMoveSpeed = moveSpeed;
+        while (true)
         {
             if (transform.position.z <= posOfMaxSpeed.z)
             {
                 SetAnimationState(AnimationState.Idle);
-                //currentMoveSpeed += moveSpeed * Time.deltaTime;
-                
                 currentMoveSpeed -= moveSpeed * ratioToUsualSpeed * Time.deltaTime;
                 if (currentMoveSpeed <= 0)
                 {
                     currentMoveSpeed = 0;
-                    isReverseMoving = false;
                     StartMoving();
-                    //SetAnimationSpeed(1);
+                    yield break;
                 }
             }
-            //characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
             characterController.Move(currentMoveSpeed * ratioToUsualSpeed * Time.deltaTime * -transform.forward);
             yield return null;
         }
-        isDeathEventRaised = false;
+    }
+
+    private void OnReachedGates()
+    {
+        print("Reached Gates");
+        StopCoroutine(movingCoroutine);
+        movingCoroutine = StoppingMoveCoroutine();
+        StartCoroutine(movingCoroutine);
+    }
+
+    private IEnumerator StoppingMoveCoroutine()
+    {
+        print("It started");
+        float time = 0;
+        bool shouldDecelerate = true;
+        shouldDeathEventRaise = false;
+        while (true)
+        {
+            time += Time.deltaTime;
+            if (shouldDecelerate)
+            { 
+                currentMoveSpeed -= moveSpeed / 2 * Time.deltaTime;
+                if (currentMoveSpeed <= 0)
+                {
+                    shouldDecelerate = false;
+                    currentMoveSpeed = 0;
+                    SetAnimationState(AnimationState.Idle);
+                    movingCoroutine = null;
+                    yield break;
+                }
+            }
+            if (editorShouldMove)
+            { 
+                characterController.Move(currentMoveSpeed * Time.deltaTime * transform.forward);
+            }
+            yield return null;
+        }
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject.layer == deathLayer.LayerIndex)
         {
-            if (!isDeathEventRaised)
+            if (shouldDeathEventRaise)
             {
-                isDeathEventRaised = true;
+                shouldDeathEventRaise = false;
                 EventsContainer.PlayerCollidedWithDeath?.Invoke();
             }
         }
     }
+
 }
 

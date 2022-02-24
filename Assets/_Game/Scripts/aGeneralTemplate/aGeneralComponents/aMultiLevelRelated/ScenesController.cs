@@ -17,17 +17,19 @@ namespace GeneralTemplate
         {
             sceneCount = SceneManager.sceneCountInBuildSettings;
 
-            GeneralEventsContainer.ShouldLoadNextScene += FinishLoadingScene;
             GeneralEventsContainer.LevelCompleted += StartLoadingNextScene;
             GeneralEventsContainer.LevelFailed += StartReloadingCurrentScene;
+            
+            GeneralEventsContainer.ShouldLoadNextScene += FinishLoadingScene;
 
         }
 
         private void OnDestroy()
         { 
-            GeneralEventsContainer.ShouldLoadNextScene -= FinishLoadingScene;
             GeneralEventsContainer.LevelCompleted -= StartLoadingNextScene;
             GeneralEventsContainer.LevelFailed -= StartReloadingCurrentScene;
+
+            GeneralEventsContainer.ShouldLoadNextScene -= FinishLoadingScene;
         }
 
         private void LoadSavedScene()

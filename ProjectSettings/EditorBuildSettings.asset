@@ -6,6 +6,9 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/_Game/Scenes/AbaiTemplate.unity
-    guid: b239128c5cf544384ba7076775926257
+    path: Assets/_Game/Scenes/aLevels/L1.unity
+    guid: 8ae3bd848269f492da13c9dd9708cd00
+  - enabled: 1
+    path: Assets/_Game/Scenes/aLevels/L2.unity
+    guid: cefd4636705774be0b69361e75bb07fd
   m_configObjects: {}
