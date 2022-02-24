@@ -12,6 +12,8 @@ namespace GeneralTemplate
 
     // Build.
 
+    // New types of timeable traps, гтльотина и песочные часы, маятник
+
     /// <summary>
     /// General functionality in our projects. 
     /// It is likely that no modifications will be needed.
