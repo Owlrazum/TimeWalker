@@ -59,6 +59,8 @@ namespace GeneralTemplate
         private void Start()
         {
             InitializeSettings();
+
+            GeneralEventsContainer.GameStart?.Invoke();
         }
 
         private void InitializeSettings()
@@ -74,7 +76,6 @@ namespace GeneralTemplate
         }
 
         #region SettingsAlternations
-
         private bool isHaptic;
         public void AlternateHaptic()
         {
@@ -95,7 +96,6 @@ namespace GeneralTemplate
                 soundController.PlaySoundTurnOn();
             }
         }
-
         #endregion
     }
 }

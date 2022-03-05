@@ -9,19 +9,23 @@ public class UILevelFail : UIBaseFadingCanvas
     protected override void Awake()
     {
         base.Awake();
-        GeneralEventsContainer.LevelFailed += ShowItself;
-        GeneralEventsContainer.ShouldLoadNextScene += HideItself;
+        GeneralEventsContainer.LevelFailed += ShowItselfOnLevelFail;
         fadeOutTime = 0.2f;
     }
 
     private void OnDestroy()
     {
-        GeneralEventsContainer.LevelFailed -= ShowItself;
-        GeneralEventsContainer.ShouldLoadNextScene -= HideItself;
+        GeneralEventsContainer.LevelFailed -= ShowItselfOnLevelFail;
+    }
+
+    private void ShowItselfOnLevelFail(int notUsed)
+    {
+        ShowItself();
     }
 
     public void OnNextLevelButtonDown()
     {
-        GeneralEventsContainer.ShouldLoadNextScene?.Invoke();
+        GeneralEventsContainer.ShouldLoadNextSceneLevel?.Invoke();
+        HideItself();
     }
 }

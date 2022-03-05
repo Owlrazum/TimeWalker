@@ -6,13 +6,18 @@ public class UIClockCanvas : UIBaseFadingCanvas
     {
         base.Awake();
 
-        GeneralEventsContainer.LevelStart += ShowItself;
+        GeneralEventsContainer.LevelStart += ShowItselfOnLevelStart;
         EventsContainer.PlayerReachedGates += HideItself;
     }
 
     private void OnDestroy()
     { 
-        GeneralEventsContainer.LevelStart -= ShowItself;
+        GeneralEventsContainer.LevelStart -= ShowItselfOnLevelStart;
         EventsContainer.PlayerReachedGates -= HideItself;
+    }
+
+    private void ShowItselfOnLevelStart(int notUsed)
+    {
+        ShowItself();
     }
 }

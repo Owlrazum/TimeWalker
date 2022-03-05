@@ -29,7 +29,7 @@ public class Player : AnimatedPlayerCharacter
         base.Awake();
         characterController = GetComponent<CharacterController>();
 
-        GeneralEventsContainer.LevelStart += StartMoving;
+        GeneralEventsContainer.LevelStart += OnLevelStart;
 
         EventsContainer.RevertingTimeFlow += OnRevertingTimeFlow;
 
@@ -43,13 +43,18 @@ public class Player : AnimatedPlayerCharacter
 
     private void OnDestroy()
     {
-        GeneralEventsContainer.LevelStart -= StartMoving;
+        GeneralEventsContainer.LevelStart -= OnLevelStart;
         
         EventsContainer.RevertingTimeFlow -= OnRevertingTimeFlow;
 
         EventsContainer.PlayerReachedGates -= OnReachedGates;
 
         QueriesContainer.PlayerMoveSpeed -= GetMoveSpeed;
+    }
+
+    private void OnLevelStart(int notUsed)
+    {
+        StartMoving();
     }
 
     private void StartMoving()

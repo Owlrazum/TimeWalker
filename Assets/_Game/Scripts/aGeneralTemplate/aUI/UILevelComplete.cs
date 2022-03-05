@@ -10,18 +10,17 @@ public class UILevelComplete : UIBaseFadingCanvas
     {
         base.Awake();
         EventsContainer.PlayerReachedGates += ShowItself;
-        GeneralEventsContainer.ShouldLoadNextScene += HideItself;
         fadeOutTime = 0.2f;
     }
 
     private void OnDestroy()
     {
         EventsContainer.PlayerReachedGates -= ShowItself;
-        GeneralEventsContainer.ShouldLoadNextScene -= HideItself;
     }
 
     public void OnNextLevelButtonDown()
     {
-        GeneralEventsContainer.ShouldLoadNextScene?.Invoke();
+        GeneralEventsContainer.ShouldLoadNextSceneLevel?.Invoke();
+        HideItself();
     }
 }
