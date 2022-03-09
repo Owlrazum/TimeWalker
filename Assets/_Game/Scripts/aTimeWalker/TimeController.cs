@@ -144,11 +144,12 @@ public class TimeController : MonoBehaviour
     {
         AnimationCurve revertingAnimation = currentClockTime.GetRevertingAnimation();
         float revertTime = revertingAnimation.keys[revertingAnimation.length - 1].time;
+        float ratioToUsualSpeed = GetRevertToUsualTimeRelation();
         while (revertTime > 0)
         {
             float revertClockTime = revertingAnimation.Evaluate(revertTime);
             EventsContainer.ClockTimeChange?.Invoke(revertClockTime);
-            revertTime -= Time.deltaTime * 3;
+            revertTime -= Time.deltaTime * ratioToUsualSpeed;
             yield return null;
         }
         currentClockTime.Reset();
