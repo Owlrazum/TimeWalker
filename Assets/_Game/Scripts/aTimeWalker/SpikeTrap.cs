@@ -7,10 +7,6 @@ public class SpikeTrap : Timeable
     private float maxHeight;
 
     [SerializeField]
-    [Tooltip("Used for the sin wave")]
-    private float divisorForPI = 12;
-
-    [SerializeField]
     [Tooltip("Should be the same and manually set")]
     private float distanceBetweenRows;
 
@@ -107,32 +103,3 @@ public class SpikeTrap : Timeable
         spikeRow.transform.position = pos;
     }
 }
-
- // protected override void OnTimeStateChange(float timeState)
-    // {
-    //     base.OnTimeStateChange(timeState);
-
-    //     for (int i = 0; i < timeStateRange.Length; i++)
-    //     {
-    //         if (i == 0) 
-    //         {
-    //             if (timeState <= timeStateRange[0])
-    //             {
-    //                 float lerpParam = timeState / timeStateRange[0];
-    //                 ChangeSpikeRowHeight(spikeRows[0], lerpParam);
-    //                 ChangeSpikeRowHeight(spikeRows[1], lerpParam - offset);
-    //             }
-    //             continue;
-    //         }
-    //         if (timeState > timeStateRange[i - 1] && timeState <= timeStateRange[i])
-    //         {
-    //             float lerpParam = (timeState - timeStateRange[i - 1]) / (timeStateRange[i] - timeStateRange[i - 1]);
-    //             ChangeSpikeRowHeight(spikeRows[i], lerpParam);
-    //             ChangeSpikeRowHeight(spikeRows[i - 1], lerpParam - offset);
-    //             if (i + 1 < timeStateRange.Length)
-    //             {
-    //                 //ChangeSpikeRowHeight(spikeRows[1], lerpParam - offset);
-    //             }
-    //         }
-    //     }
-    // }

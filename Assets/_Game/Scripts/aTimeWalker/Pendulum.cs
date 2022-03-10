@@ -31,7 +31,7 @@ public class Pendulum : Timeable
             transform.rotation = Quaternion.Slerp(
                 Quaternion.Euler(startingEuler),
                 Quaternion.Euler(endingEuler),
-                CustomMath.EaseInOut(CustomMath.EaseInOut(timeState))
+                CustomMath.EaseInOut(timeState)
             );
         }
         else
@@ -40,7 +40,7 @@ public class Pendulum : Timeable
             transform.rotation = Quaternion.Slerp(
                 Quaternion.Euler(endingEuler),
                 Quaternion.Euler(startingEuler),
-                CustomMath.EaseInOut(CustomMath.EaseInOut(timeState))
+                CustomMath.EaseInOut(timeState)
             );
         }
 
