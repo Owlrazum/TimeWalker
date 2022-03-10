@@ -59,7 +59,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 9ec895edcc1674d60bcd88cd46b29f91, type: 2}
+  - {fileID: 2100000, guid: 3b2ed0ae7785d4191883f788a4838a41, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -127,6 +127,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   periodOfFreePassage: 0
+  timeOffset: 0
   halfAngle: 50
 --- !u!1 &4411740704630193250
 GameObject:
