@@ -6,7 +6,10 @@ public static class EventsContainer
     public static Action PlayerCollidedWithDeath;
 
     public static Action RevertingTimeFlow;
+    public static Action RevertingTimeFlowFinished;
     public static Action UsualTimeFlow;
+
+    public static Action PlayerTimeControllerSynced;
 
     //public static Action PlayerStartedDecelerating;
     //public static Action PlayerRevertedToStartPos;

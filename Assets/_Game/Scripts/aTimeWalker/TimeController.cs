@@ -26,6 +26,8 @@ public class TimeController : MonoBehaviour
 
     private ClockTime currentClockTime;
 
+    private bool areTimeablesFinishedReverting;
+
     private void Awake()
     {
         currentClockTime = new ClockTime();
@@ -35,9 +37,13 @@ public class TimeController : MonoBehaviour
         EventsContainer.ClockInputEnd    += OnClockInputEnd;
 
         EventsContainer.PlayerCollidedWithDeath += OnPlayerCollidedWithDeath;
+        
+        EventsContainer.PlayerTimeControllerSynced += OnPlayerTimeControllerSynced;
 
         QueriesContainer.RevertToUsualTimeRelation += GetRevertToUsualTimeRelation;
         QueriesContainer.MaxClockTimeChange += GetMaxClockTimeChange;
+
+        QueriesContainer.AreTimeablesFinishedReverting += GetAreTimeablesFinishedReverting;
 
         SetTimeFlow(TimeFlowType.Usual);
     }
@@ -50,8 +56,12 @@ public class TimeController : MonoBehaviour
 
         EventsContainer.PlayerCollidedWithDeath -= OnPlayerCollidedWithDeath;
 
+        EventsContainer.PlayerTimeControllerSynced -= OnPlayerTimeControllerSynced;
+
         QueriesContainer.RevertToUsualTimeRelation -= GetRevertToUsualTimeRelation;
         QueriesContainer.MaxClockTimeChange -= GetMaxClockTimeChange;
+
+        QueriesContainer.AreTimeablesFinishedReverting += GetAreTimeablesFinishedReverting;
     }
 
     private void OnClockInputStart()
@@ -154,6 +164,29 @@ public class TimeController : MonoBehaviour
         }
         currentClockTime.Reset();
         EventsContainer.ClockTimeChange?.Invoke(currentClockTime.GetTime());
+
+        areTimeablesFinishedReverting = true;
+        while (!QueriesContainer.QueryIsPlayerFinishedReverting())
+        {
+            yield return null;
+        }
+        if (!areTimeablesFinishedReverting)
+        {
+            // Already processed event
+            yield break;
+        }
+        EventsContainer.PlayerTimeControllerSynced?.Invoke();
+    }
+
+    private void OnPlayerTimeControllerSynced()
+    {
+        areTimeablesFinishedReverting = false;
+        EventsContainer.RevertingTimeFlowFinished?.Invoke();
         SetTimeFlow(TimeFlowType.Usual);
+    }
+
+    private bool GetAreTimeablesFinishedReverting()
+    {
+        return areTimeablesFinishedReverting;
     }
 }

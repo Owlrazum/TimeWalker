@@ -12,7 +12,8 @@ public class Timeable : MonoBehaviour
     [SerializeField]
     protected PeriodOfFreePassageType periodOfFreePassage;
 
-    protected float timeOffset;
+    [SerializeField]
+    protected float timeOffset = 0;
 
     protected bool shouldRespondToTimeChange;
 
@@ -23,9 +24,12 @@ public class Timeable : MonoBehaviour
         EventsContainer.ClockTimeChange += OnTimeStateChange;
         //EventsContainer.AllTimeablesShouldDefault += OnAllTimeablesShouldDefault;
 
-        if (periodOfFreePassage == PeriodOfFreePassageType.AfterPI)
-        {
-            timeOffset = 0.5f;
+        if (timeOffset == 0)
+        { 
+            if (periodOfFreePassage == PeriodOfFreePassageType.AfterPI)
+            {
+                timeOffset = 0.5f;
+            }
         }
     }
 

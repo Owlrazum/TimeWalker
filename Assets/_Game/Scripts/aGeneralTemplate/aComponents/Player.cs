@@ -24,6 +24,8 @@ public class Player : AnimatedPlayerCharacter
     private float currentMoveSpeed;
     private IEnumerator movingCoroutine;
 
+    private bool isFinishedReverting;
+
     protected override void Awake()
     {
         base.Awake();
@@ -35,7 +37,10 @@ public class Player : AnimatedPlayerCharacter
 
         EventsContainer.PlayerReachedGates += OnReachedGates;
 
+        EventsContainer.PlayerTimeControllerSynced += OnPlayerTimeContollerSynced;
+
         QueriesContainer.PlayerMoveSpeed += GetMoveSpeed;
+        QueriesContainer.IsPlayerFinishedReverting += GetIsFinishedReverting;
 
 
         initialPos = transform.position;
@@ -49,7 +54,10 @@ public class Player : AnimatedPlayerCharacter
 
         EventsContainer.PlayerReachedGates -= OnReachedGates;
 
+        EventsContainer.PlayerTimeControllerSynced -= OnPlayerTimeContollerSynced;
+
         QueriesContainer.PlayerMoveSpeed -= GetMoveSpeed;
+        QueriesContainer.IsPlayerFinishedReverting -= GetIsFinishedReverting;
     }
 
     private void OnLevelStart(int notUsed)
@@ -125,13 +133,29 @@ public class Player : AnimatedPlayerCharacter
                 if (currentMoveSpeed <= 0)
                 {
                     currentMoveSpeed = 0;
-                    StartMoving();
-                    yield break;
+                    break;
                 }
             }
             characterController.Move(currentMoveSpeed * ratioToUsualSpeed * Time.deltaTime * -transform.forward);
             yield return null;
         }
+        isFinishedReverting = true;
+        while (!QueriesContainer.AreTimeablesFinishedReverting())
+        {
+            yield return null;
+        }
+        if (!isFinishedReverting)
+        {
+            // Already processed sync event
+            yield break;
+        }
+        EventsContainer.PlayerTimeControllerSynced?.Invoke();
+    }
+
+    private void OnPlayerTimeContollerSynced()
+    {
+        isFinishedReverting = false;
+        StartMoving();
     }
 
     private void OnReachedGates()
@@ -183,5 +207,9 @@ public class Player : AnimatedPlayerCharacter
         }
     }
 
+    private bool GetIsFinishedReverting()
+    {
+        return isFinishedReverting;
+    }
 }
 

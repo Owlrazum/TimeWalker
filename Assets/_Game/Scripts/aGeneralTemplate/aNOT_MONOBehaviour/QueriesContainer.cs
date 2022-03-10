@@ -17,8 +17,6 @@ public static class QueriesContainer
         return ScenesCount.Invoke();
     }
 
-
-
     public static Func<bool> AreAllLevelsPassed;
     public static bool QueryAreAllLevelsPassed()
     { 
@@ -126,7 +124,7 @@ public static class QueriesContainer
     public static Func<float> MaxClockTimeChange;
     public static float QeuryMaxClockTimeInFrame()
     { 
-        #if UNITY_EDITOR
+#if UNITY_EDITOR
         if (MaxClockTimeChange.GetInvocationList().Length != 1)
         {
             throw new NotSupportedException("There should be only one subscription");
@@ -134,5 +132,31 @@ public static class QueriesContainer
 #endif        
 
         return MaxClockTimeChange.Invoke();
+    }
+
+    public static Func<bool> AreTimeablesFinishedReverting;
+    public static bool QueryAreTimeablesFinishedReverting()
+    { 
+#if UNITY_EDITOR
+        if (AreTimeablesFinishedReverting.GetInvocationList().Length != 1)
+        {
+            throw new NotSupportedException("There should be only one subscription");
+        }
+#endif        
+
+        return AreTimeablesFinishedReverting.Invoke();
+    }
+
+    public static Func<bool> IsPlayerFinishedReverting;
+    public static bool QueryIsPlayerFinishedReverting()
+    { 
+#if UNITY_EDITOR
+        if (IsPlayerFinishedReverting.GetInvocationList().Length != 1)
+        {
+            throw new NotSupportedException("There should be only one subscription");
+        }
+#endif        
+
+        return IsPlayerFinishedReverting.Invoke();
     }
 }

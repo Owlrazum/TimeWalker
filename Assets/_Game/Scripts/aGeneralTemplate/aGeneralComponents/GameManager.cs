@@ -14,6 +14,8 @@ namespace GeneralTemplate
 
     // New types of timeable traps, гтльотина и песочные часы, маятник
 
+    // Increase size of arrow hitbox.
+
     /// <summary>
     /// General functionality in our projects. 
     /// It is likely that no modifications will be needed.

@@ -30,6 +30,7 @@ public class AnimatedPlayerCharacter : MonoBehaviour
     {
         if (animationState == newState)
         {
+            Debug.LogWarning("Adundant call to the SetAnimatoinState");
             return;
         }
         switch (newState)
