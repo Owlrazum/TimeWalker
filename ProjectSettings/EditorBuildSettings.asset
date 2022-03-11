@@ -9,6 +9,9 @@ EditorBuildSettings:
     path: Assets/_Game/Scenes/aLevels/MultiUniverse.unity
     guid: 378618ade3c374e96a7caf5a2ffeaa2b
   - enabled: 1
+    path: Assets/_Game/Scenes/Development.unity
+    guid: 0587ac528b8bf42f9aa9ff39fe218b19
+  - enabled: 1
     path: Assets/_Game/Scenes/aLevels/L1.unity
     guid: 8ae3bd848269f492da13c9dd9708cd00
   - enabled: 1
