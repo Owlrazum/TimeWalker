@@ -21,7 +21,6 @@ public class HellBlade : Timeable
     private float angleStepDeg;
 
     [SerializeField]
-    [Min(3)]
     private int changesCount;
 
     [SerializeField]
@@ -172,111 +171,12 @@ public class HellBlade : Timeable
     private float rightStartYaw;
     private float rightEndYaw;
 
-    private enum NearestPoint
-    { 
-        Left,
-        Right
-    }
-
     protected override void Awake()
     {
         base.Awake();
 
-        ranges = new List<TimeRange>();
+        InitalizeTimeRanges(changesCount);
 
-        List<float> anchors = new List<float>();
-        anchors = new List<float>();
-        float anchorDelta = 1.0f / changesCount;
-        for (int i = 1; i < changesCount; i++)
-        {
-            anchors.Add(i * anchorDelta);
-        }
-
-        #region Initializing timeRanges
-        int rangeIndex = 0;
-
-        currentTimeRange = null;
-        bool initializedCurrentTimeRange = false;
-        // anchor at i == 0 are processed by initial TimeRange;
-        TimeRange initial = new TimeRange(1 - rangeLength, rangeLength);
-        ranges.Add(initial);
-        initial.Index = rangeIndex++;
-        if (initial.GetParameterState(timeOffset) == TimeRange.ParameterState.Inside)
-        {
-            currentTimeRange = initial;
-            initializedCurrentTimeRange = true;
-        }
-        
-        TimeRange initialStatic = new TimeRange(rangeLength, anchors[0] - rangeLength);
-        initialStatic.SetStatic(true);
-        ranges.Add(initialStatic);
-        initialStatic.Index = rangeIndex++;
-        if (!initializedCurrentTimeRange)
-        {
-            if (initial.GetParameterState(timeOffset) == TimeRange.ParameterState.Inside)
-            { 
-                currentTimeRange = initialStatic;
-                initializedCurrentTimeRange = true;
-            }
-        }
-
-        for (int i = 0; i < anchors.Count - 1; i++)
-        {
-            TimeRange timeRange = new TimeRange(anchors[i] - rangeLength, anchors[i] + rangeLength);
-            ranges.Add(timeRange);
-            timeRange.Index = rangeIndex++;
-            if (!initializedCurrentTimeRange)
-            {
-                if (initial.GetParameterState(timeOffset) == TimeRange.ParameterState.Inside)
-                { 
-                    currentTimeRange = timeRange;
-                    initializedCurrentTimeRange = true;
-                }
-            }
-            TimeRange staticRange = new TimeRange(anchors[i] + rangeLength, anchors[i + 1] - rangeLength);
-            staticRange.SetStatic(true);
-            staticRange.Index = rangeIndex++;
-            ranges.Add(staticRange);
-            if (!initializedCurrentTimeRange)
-            {
-                if (initial.GetParameterState(timeOffset) == TimeRange.ParameterState.Inside)
-                { 
-                    currentTimeRange = staticRange;
-                    initializedCurrentTimeRange = true;
-                }
-            }
-        }
-
-        TimeRange endingRange = new TimeRange(
-            anchors[changesCount - 2] - rangeLength, 
-            anchors[changesCount - 2] + rangeLength
-        );
-        ranges.Add(endingRange);
-        endingRange.Index = rangeIndex++;
-
-        if (!initializedCurrentTimeRange)
-        {
-            if (initial.GetParameterState(timeOffset) == TimeRange.ParameterState.Inside)
-            { 
-                currentTimeRange = endingRange;
-                initializedCurrentTimeRange = true;
-            }
-        }
-
-        TimeRange endingStaticRange = new TimeRange(
-            anchors[changesCount - 2] + rangeLength,
-            1 - rangeLength
-        );
-        endingStaticRange.SetStatic(true);
-        ranges.Add(endingStaticRange);
-        endingStaticRange.Index = rangeIndex++;
-        if (!initializedCurrentTimeRange)
-        {
-            currentTimeRange = endingStaticRange;
-            initializedCurrentTimeRange = true;
-        }
-        #endregion
-        
         //Offset if AfterPI;
         OnTimeStateChange(0);
 
@@ -285,6 +185,51 @@ public class HellBlade : Timeable
 
         leftEndYaw  = 1 * angleStepDeg;
         rightEndYaw = rightSign * angleStepDeg;
+    }
+
+    private void InitalizeTimeRanges(int anchorsAmount)
+    { 
+        ranges = new List<TimeRange>();
+        List<float> anchors = new List<float>();
+        float anchorDelta = 1.0f / anchorsAmount;
+        maxRange = anchorDelta / 2;
+        for (int i = 0; i < anchorsAmount; i++)
+        {
+            anchors.Add(i * anchorDelta + anchorDelta / 2);
+        }
+
+        int rangeIndex = 0;
+
+        currentTimeRange = null;
+        for (int i = 0; i < anchors.Count; i++)
+        {
+            TimeRange timeRange = new TimeRange(anchors[i] - rangeLength, anchors[i] + rangeLength);
+            timeRange.Index = rangeIndex++;
+            ranges.Add(timeRange);
+            if (currentTimeRange == null)
+            {
+                if (timeRange.GetParameterState(timeOffset) == TimeRange.ParameterState.Inside)
+                { 
+                    currentTimeRange = timeRange;
+                }
+            }
+            int nextAnchorIndex = i + 1;
+            if (nextAnchorIndex >= anchorsAmount)
+            {
+                nextAnchorIndex = 0;
+            }
+            TimeRange staticRange = new TimeRange(anchors[i] + rangeLength, anchors[nextAnchorIndex] - rangeLength);
+            staticRange.SetStatic(true);
+            staticRange.Index = rangeIndex++;
+            ranges.Add(staticRange);
+            if (currentTimeRange == null)
+            {
+                if (staticRange.GetParameterState(timeOffset) == TimeRange.ParameterState.Inside)
+                { 
+                    currentTimeRange = staticRange;
+                }
+            }
+        }
     }
 
     protected override float OnTimeStateChange(float timeState)
@@ -309,19 +254,30 @@ public class HellBlade : Timeable
                     break;
                 case TimeRange.ParameterState.OutsideToTheRight:
                     if (currentTimeRange.IsStatic())
-                    { 
-                        UpdateLerpRotations(Mathf.Sign(1));
+                    {
+                        UpdateLerpRotations(Side.ToTheRight);
                     }
                     currentTimeRange = ranges[GetNextIndex(currentTimeRange)];
+                    if (currentTimeRange.IsStatic())
+                    { 
+                        leftBlades.rotation  = Quaternion.Euler(Vector3.up * leftEndYaw); 
+                        rightBlades.rotation = Quaternion.Euler(Vector3.up * rightEndYaw);
+                    }
                     isCurrentTimeRangeRelevant = true;
                     break;
                 case TimeRange.ParameterState.OutsideToTheLeft:
-                if (currentTimeRange.IsStatic())
+                    if (currentTimeRange.IsStatic())
                     { 
-                        UpdateLerpRotations(Mathf.Sign(-1));
+                        UpdateLerpRotations(Side.ToTheLeft);
                     }
                     currentTimeRange = ranges[GetPrevIndex(currentTimeRange)];
+                    if (currentTimeRange.IsStatic())
+                    {
+                        leftBlades.rotation  = Quaternion.Euler(Vector3.up * leftStartYaw); 
+                        rightBlades.rotation = Quaternion.Euler(Vector3.up * rightStartYaw);
+                    } 
                     isCurrentTimeRangeRelevant = true;
+
                     break;
             }
             safePillow++;
@@ -359,12 +315,29 @@ public class HellBlade : Timeable
         return prevIndex;
     }
 
-    private void UpdateLerpRotations(float sign)
-    {
-        leftStartYaw = leftEndYaw;
-        leftEndYaw += angleStepDeg * sign;
+    private enum Side
+    { 
+        ToTheLeft,
+        ToTheRight
+    }
 
-        rightStartYaw = rightEndYaw;
-        rightEndYaw += angleStepDeg * -sign;
+    private void UpdateLerpRotations(Side side)
+    {
+        if (side == Side.ToTheRight)
+        { 
+            leftStartYaw = leftEndYaw;
+            leftEndYaw += angleStepDeg;
+
+            rightStartYaw = rightEndYaw;
+            rightEndYaw -= angleStepDeg;
+        }
+        else if (side == Side.ToTheLeft)
+        {
+            leftEndYaw = leftStartYaw;
+            leftStartYaw -= angleStepDeg;
+
+            rightEndYaw = rightStartYaw;
+            rightStartYaw += angleStepDeg;
+        }
     }
 }
